@@ -9,3 +9,5 @@ class FlashCard(models.Model):
     last_reply = models.BooleanField(default=False)
     created_at = models.DateField(auto_now_add=True)
     next_review_date = models.DateField()
+
+    
