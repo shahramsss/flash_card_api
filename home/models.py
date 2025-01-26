@@ -10,4 +10,5 @@ class FlashCard(models.Model):
     created_at = models.DateField(auto_now_add=True)
     next_review_date = models.DateField()
 
-    
+    def __str__(self):
+        return f"{self.word} - {self.meaning}"

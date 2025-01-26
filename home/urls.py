@@ -19,4 +19,7 @@ from django.urls import path
 from .views import *
 
 app_name = "home"
-urlpatterns = [path("home/", Home.as_view(), name="home")]
+urlpatterns = [
+    path("home/", Home.as_view(), name="home"),
+    path("word/<int:pk>/", Word.as_view(), name="word"),
+]
