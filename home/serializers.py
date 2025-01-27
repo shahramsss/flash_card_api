@@ -22,12 +22,6 @@ class FlashCardSerializer(serializers.ModelSerializer):
             "next_review_date_jalali",
         ]
 
-    def validate_word(self, value):
-        # بررسی وجود فلش‌کارت با همین نام (کلمه)
-        if FlashCard.objects.filter(word=value).exists():
-            raise serializers.ValidationError("این کلمه قبلاً ثبت شده است.")
-        return value
-
     def get_created_at_jalali(self, obj):
         if obj.created_at:
             return JalaliDate(obj.created_at).strftime("%A, %d %B, %Y")
