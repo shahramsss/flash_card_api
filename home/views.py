@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.exceptions import NotFound
 from rest_framework.exceptions import ValidationError
-from datetime import timedelta
+from datetime import timedelta, date
 
 
 class Home(APIView):
@@ -60,14 +60,17 @@ class Word(APIView):
 
         # بررسی مقدار last_reply و افزایش نرخ
         last_reply = data.get("last_reply")
-        rate =int(flash_card.rate)
-        print('*'*90)
-        print(last_reply)
-        print(type(last_reply))
-        if last_reply in ["True", "true", True] :
-            
+        rate = int(flash_card.rate)
+        next_review_date = flash_card.next_review_date
+        today = date.today()
+        if (
+            last_reply in ["True", "true", True]
+            and rate < 8
+            and next_review_date <= today
+        ):
+
             data["rate"] = rate + 1
-            data["next_review_date"] = flash_card.next_review_date + timedelta(days=1)
+            data["next_review_date"] = date.today() + timedelta(days=1)
 
         # سریالایز و ذخیره داده‌ها
         serializer = FlashCardSerializer(flash_card, data=data, partial=True)
