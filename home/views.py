@@ -61,9 +61,11 @@ class Word(APIView):
         # بررسی مقدار last_reply و افزایش نرخ
         last_reply = data.get("last_reply")
         rate =int(flash_card.rate)
-        if last_reply in ["True", "true", True] and rate > 8:
-            print('*'*90)
-            print(data['last_reply'])
+        print('*'*90)
+        print(last_reply)
+        print(type(last_reply))
+        if last_reply in ["True", "true", True] :
+            
             data["rate"] = rate + 1
             data["next_review_date"] = flash_card.next_review_date + timedelta(days=1)
 
