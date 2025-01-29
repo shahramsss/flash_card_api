@@ -82,4 +82,8 @@ class Word(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, pk):
-        pass
+        flash_card = self.get_object(pk)  # دریافت فلش‌کارت
+        flash_card.delete()  # حذف فلش‌کارت
+        return Response(
+            {"detail": "فلش‌کارت با موفقیت حذف شد!"}, status=status.HTTP_204_NO_CONTENT
+        )
