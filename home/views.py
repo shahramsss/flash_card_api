@@ -128,3 +128,9 @@ class HomeView(View):
     def get(self, request):
         cards = FlashCard.objects.filter(next_review_date__lte=date.today())
         return render(request, "home/home.html", {"cards": cards})
+
+class CardsWrongView(View):
+    def get(self, request):
+        cards = FlashCard.objects.filter(last_reply = False)
+        return render(request, "home/cards_wrong.html", {"cards": cards})
+        

@@ -26,5 +26,6 @@ urlpatterns = [
     path("wordapi/<int:pk>/", Word.as_view(), name="word"),
     path("cards/" ,CardsView.as_view(),name="cards"),
     path("cardsdetails/<int:id>/" ,CardDetialsView.as_view(),name="cardsdetails"),
+    path("cardswrong/" ,CardsWrongView.as_view(),name="cardswrong"),
 
 ]

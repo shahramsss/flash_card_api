@@ -1,6 +1,6 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid">
-      <a class="navbar-brand" href="#">FlashCards</a>
+      <a class="navbar-brand" href="{% url 'home:home' %}">FlashCards</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -9,23 +9,11 @@
           <li class="nav-item">
             <a class="nav-link active" aria-current="page" href="{% url 'home:home' %}">Home</a>
           </li>
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              Words
-            </a>
-            <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-              {% if cards %}
-                {% for card in cards %}
-                  <li>
-                    <a class="dropdown-item" href="{% url 'home:cardsdetails' card.id %}">{{ card.word }}</a>
-                  </li>
-                {% endfor %}
-              {% else %}
-                <li>
-                  <a class="dropdown-item text-muted" href="#">No words available</a>
-                </li>
-              {% endif %}
-            </ul>
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="{% url 'home:cardswrong' %}">all</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="{% url 'home:cardswrong' %}">add</a>
           </li>
         </ul>
       </div>
