@@ -21,6 +21,7 @@ from .views import *
 
 app_name = "home"
 urlpatterns = [
+    path("home/" ,HomeView.as_view(),name="home"),
     path("homeapi/", Home.as_view(), name="homeapi"),
     path("wordapi/<int:pk>/", Word.as_view(), name="word"),
     path("cards/" ,CardsView.as_view(),name="cards"),

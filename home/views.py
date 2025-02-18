@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render , redirect
 from rest_framework.views import APIView
 from .models import FlashCard
 from .serializers import FlashCardSerializer
@@ -8,7 +8,7 @@ from rest_framework.exceptions import NotFound
 from rest_framework.exceptions import ValidationError
 from datetime import timedelta, date
 from django.views import View
-from django.utils.timezone import now
+from django.db.models import Q
 
 
 class Home(APIView):
@@ -88,33 +88,43 @@ class Word(APIView):
         )
 
 
-
 class CardsView(View):
-    def get(self , request):
+    def get(self, request):
         cards = FlashCard.objects.all()
-        return render(request ,'home/cards.html',{'cards':cards})
-    
+        return render(request, "home/cards.html", {"cards": cards})
+
     def post(self, request):
-        answers = request.POST.getlist('')
+        answers = request.POST.getlist("")
         # حالا می‌توانید پاسخ‌ها را بررسی کرده و ذخیره کنید
         print(answers)
         for card_id, answer in answers:
-            print(card_id , ": ",answer )
-        
+            print(card_id, ": ", answer)
+
         cards = FlashCard.objects.all()
-        return render(request ,'home/cards.html',{'cards':cards})
+        return render(request, "home/cards.html", {"cards": cards})
 
 
 class CardDetialsView(View):
-    def get(self , request  , id ):
-        card= FlashCard.objects.get(id = id)
-        return render(request ,'home/card_details.html',{'card':card})
-    
-    def post(self , request , id ):
-        req = request.POST.get('answer')
-        print(req)
-        user_answer = request.POST.get('answer')  # دریافت پاسخ کاربر
-        print(f"User's answer: {user_answer}")  # چاپ پاسخ کاربر
-        card= FlashCard.objects.get(id = id)
-        return render(request ,'home/card_details.html',{'card':card})
+    def get(self, request, id):
+        card = FlashCard.objects.get(id=id)
+        return render(request, "home/card_details.html", {"card": card})
 
+    def post(self, request, id):
+        user_answer = request.POST.get("answer")
+        card = FlashCard.objects.get(id=id)
+        if user_answer == "yes":
+            card.last_reply = True
+            card.rate += 1
+            card.next_review_date = date.today() + timedelta(days=1)
+        elif user_answer == "no":
+            card.last_reply = False
+            card.next_review_date = date.today() + timedelta(days=1)
+        card.save()
+
+        return redirect("home:home")
+
+
+class HomeView(View):
+    def get(self, request):
+        cards = FlashCard.objects.filter(next_review_date__lte=date.today())
+        return render(request, "home/home.html", {"cards": cards})
