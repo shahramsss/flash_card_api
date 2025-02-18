@@ -7,6 +7,8 @@ from rest_framework import status
 from rest_framework.exceptions import NotFound
 from rest_framework.exceptions import ValidationError
 from datetime import timedelta, date
+from django.views import View
+from django.utils.timezone import now
 
 
 class Home(APIView):
@@ -14,23 +16,6 @@ class Home(APIView):
         flash_cards = FlashCard.objects.all()
         serializer = FlashCardSerializer(flash_cards, many=True)
         return Response(serializer.data)
-
-    def post(self, request):
-        word = request.data.get("word", "").strip()
-        if not word:
-            return Response(
-                {"error": "فیلد 'word' الزامی است."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        # بررسی وجود کلمه تکراری
-        if FlashCard.objects.filter(word=word).exists():
-            raise ValidationError("این کلمه قبلاً ثبت شده است.")
-        serializer = FlashCardSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class Word(APIView):
@@ -51,10 +36,24 @@ class Word(APIView):
         serializer = FlashCardSerializer(flash_card)
         return Response(data=serializer.data)
 
+    def post(self, request):
+        word = request.data.get("word", "").strip()
+        if not word:
+            return Response(
+                {"error": "فیلد 'word' الزامی است."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # بررسی وجود کلمه تکراری
+        if FlashCard.objects.filter(word=word).exists():
+            raise ValidationError("این کلمه قبلاً ثبت شده است.")
+        serializer = FlashCardSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
     def put(self, request, pk):
-        """
-        به‌روزرسانی یک فلش‌کارت
-        """
         flash_card = self.get_object(pk)
         data = request.data
 
@@ -87,3 +86,35 @@ class Word(APIView):
         return Response(
             {"detail": "فلش‌کارت با موفقیت حذف شد!"}, status=status.HTTP_204_NO_CONTENT
         )
+
+
+
+class CardsView(View):
+    def get(self , request):
+        cards = FlashCard.objects.all()
+        return render(request ,'home/cards.html',{'cards':cards})
+    
+    def post(self, request):
+        answers = request.POST.getlist('')
+        # حالا می‌توانید پاسخ‌ها را بررسی کرده و ذخیره کنید
+        print(answers)
+        for card_id, answer in answers:
+            print(card_id , ": ",answer )
+        
+        cards = FlashCard.objects.all()
+        return render(request ,'home/cards.html',{'cards':cards})
+
+
+class CardDetialsView(View):
+    def get(self , request  , id ):
+        card= FlashCard.objects.get(id = id)
+        return render(request ,'home/card_details.html',{'card':card})
+    
+    def post(self , request , id ):
+        req = request.POST.get('answer')
+        print(req)
+        user_answer = request.POST.get('answer')  # دریافت پاسخ کاربر
+        print(f"User's answer: {user_answer}")  # چاپ پاسخ کاربر
+        card= FlashCard.objects.get(id = id)
+        return render(request ,'home/card_details.html',{'card':card})
+

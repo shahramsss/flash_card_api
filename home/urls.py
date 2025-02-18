@@ -18,8 +18,12 @@ Including another URLconf
 from django.urls import path
 from .views import *
 
+
 app_name = "home"
 urlpatterns = [
-    path("home/", Home.as_view(), name="home"),
-    path("word/<int:pk>/", Word.as_view(), name="word"),
+    path("homeapi/", Home.as_view(), name="homeapi"),
+    path("wordapi/<int:pk>/", Word.as_view(), name="word"),
+    path("cards/" ,CardsView.as_view(),name="cards"),
+    path("cardsdetails/<int:id>/" ,CardDetialsView.as_view(),name="cardsdetails"),
+
 ]
