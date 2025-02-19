@@ -27,5 +27,6 @@ urlpatterns = [
     path("cards/" ,CardsView.as_view(),name="cards"),
     path("cardsdetails/<int:id>/" ,CardDetialsView.as_view(),name="cardsdetails"),
     path("cardswrong/" ,CardsWrongView.as_view(),name="cardswrong"),
+    path("cardcreate/" ,CardCreatView.as_view(),name="cardcreate"),
 
 ]

@@ -1,4 +1,4 @@
-from django.shortcuts import render , redirect
+from django.shortcuts import render, redirect
 from rest_framework.views import APIView
 from .models import FlashCard
 from .serializers import FlashCardSerializer
@@ -9,6 +9,7 @@ from rest_framework.exceptions import ValidationError
 from datetime import timedelta, date
 from django.views import View
 from django.db.models import Q
+from .forms import CardCreateForm
 
 
 class Home(APIView):
@@ -129,8 +130,22 @@ class HomeView(View):
         cards = FlashCard.objects.filter(next_review_date__lte=date.today())
         return render(request, "home/home.html", {"cards": cards})
 
+
 class CardsWrongView(View):
     def get(self, request):
-        cards = FlashCard.objects.filter(last_reply = False)
+        cards = FlashCard.objects.filter(last_reply=False)
         return render(request, "home/cards_wrong.html", {"cards": cards})
-        
+
+
+class CardCreatView(View):
+    def get(self, request):
+        form = CardCreateForm
+        return render(request, "home/card_create.html", {"form": form})
+
+    def post(self, request):
+        form = CardCreateForm(request.POST)
+        if form.is_valid():
+            card = form.save(commit=False)
+            card.next_review_date = date.today() + timedelta(days=1)
+            card.save()
+            return redirect("home:home")
