@@ -163,7 +163,17 @@ class CardCreatView(View):
 
 class CardsSearchView(View):
     def get(self, request):
-        pass
+        query = request.GET.get("query", "")  # در صورتی که query وجود نداشته باشد، مقدار پیش‌فرض "" خواهد بود
+        if query:
+            cards = FlashCard.objects.filter(
+                Q(word__icontains=query) | 
+                Q(meaning__icontains=query) | 
+                Q(example__icontains=query)
+            )
+        else:
+            cards = FlashCard.objects.all()  
+        
+        return render(request, 'home/cards.html', {'cards': cards, 'query': query})
 
 
 class CardEditView(View):
