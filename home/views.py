@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from rest_framework.views import APIView
 from .models import FlashCard
 from .serializers import FlashCardSerializer
@@ -94,15 +94,7 @@ class CardsView(View):
         cards = FlashCard.objects.all()
         return render(request, "home/cards.html", {"cards": cards})
 
-    def post(self, request):
-        answers = request.POST.getlist("")
-        # حالا می‌توانید پاسخ‌ها را بررسی کرده و ذخیره کنید
-        print(answers)
-        for card_id, answer in answers:
-            print(card_id, ": ", answer)
-
-        cards = FlashCard.objects.all()
-        return render(request, "home/cards.html", {"cards": cards})
+    
 
 
 class CardDetialsView(View):
@@ -129,8 +121,8 @@ class CardDetialsView(View):
             card.last_reply = True
             card.rate += 1
             card.next_review_date = date.today() + timedelta(days=30)
-            
-        if user_answer == "yes" and rate == 11:
+
+        if user_answer == "yes" and rate >= 11:
             card.last_reply = True
             card.rate += 1
             card.next_review_date = date.today() + timedelta(days=365)
@@ -167,3 +159,22 @@ class CardCreatView(View):
             card.next_review_date = date.today() + timedelta(days=1)
             card.save()
             return redirect("home:home")
+
+
+class CardsSearchView(View):
+    def get(self, request):
+        pass
+
+
+class CardEditView(View):
+    def get(self, request, id):
+        card = get_object_or_404(FlashCard , id = id )
+        form = CardCreateForm(instance=card)
+        return render(request, 'home/card_edit.html', {'form': form, 'card': card})
+
+    def post(self , request , id ):
+        card = get_object_or_404(FlashCard , id = id )
+        form = CardCreateForm(request.POST ,instance=card )
+        if form.is_valid():
+            form.save()
+        return redirect('home:cards')
