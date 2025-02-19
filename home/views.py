@@ -143,14 +143,16 @@ class HomeView(View):
 
 class CardsWrongView(View):
     def get(self, request):
+        title  = 'wrong Cards'
         cards = FlashCard.objects.filter(last_reply=False)
-        return render(request, "home/cards_wrong.html", {"cards": cards})
+        return render(request, "home/cards_wrong.html", {"cards": cards , "title": title})
 
 
 class CardCreatView(View):
     def get(self, request):
+        title  = 'Create Card'
         form = CardCreateForm
-        return render(request, "home/card_create.html", {"form": form})
+        return render(request, "home/card_create.html", {"form": form , 'title': title})
 
     def post(self, request):
         form = CardCreateForm(request.POST)
@@ -158,7 +160,7 @@ class CardCreatView(View):
             card = form.save(commit=False)
             card.next_review_date = date.today() + timedelta(days=1)
             card.save()
-            return redirect("home:home")
+            return redirect("home:cardnewest")
 
 
 class CardsSearchView(View):
@@ -172,15 +174,17 @@ class CardsSearchView(View):
             )
         else:
             cards = FlashCard.objects.all()  
+        title  = 'Search Cards'
         
-        return render(request, 'home/cards.html', {'cards': cards, 'query': query})
+        return render(request, 'home/cards_search.html', {'cards': cards, 'title': title})
 
 
 class CardEditView(View):
     def get(self, request, id):
         card = get_object_or_404(FlashCard , id = id )
         form = CardCreateForm(instance=card)
-        return render(request, 'home/card_edit.html', {'form': form, 'card': card})
+        title = "Edit Card"
+        return render(request, 'home/card_edit.html', {'form': form, 'card': card , 'title':title})
 
     def post(self , request , id ):
         card = get_object_or_404(FlashCard , id = id )

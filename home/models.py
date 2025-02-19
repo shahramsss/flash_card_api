@@ -7,7 +7,7 @@ class FlashCard(models.Model):
     example = models.CharField(max_length=1024, null=True, blank=True)
     rate = models.SmallIntegerField(default=0)
     last_reply = models.BooleanField(default=False)
-    created_at = models.DateField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
     next_review_date = models.DateField()
 
     def __str__(self):
