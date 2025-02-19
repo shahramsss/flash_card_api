@@ -113,11 +113,29 @@ class CardDetialsView(View):
     def post(self, request, id):
         user_answer = request.POST.get("answer")
         card = FlashCard.objects.get(id=id)
-        if user_answer == "yes":
+        rate = card.rate
+
+        if user_answer == "yes" and rate < 9:
             card.last_reply = True
             card.rate += 1
             card.next_review_date = date.today() + timedelta(days=1)
-        elif user_answer == "no":
+
+        if user_answer == "yes" and rate == 9:
+            card.last_reply = True
+            card.rate += 1
+            card.next_review_date = date.today() + timedelta(weeks=1)
+
+        if user_answer == "yes" and rate == 10:
+            card.last_reply = True
+            card.rate += 1
+            card.next_review_date = date.today() + timedelta(days=30)
+            
+        if user_answer == "yes" and rate == 11:
+            card.last_reply = True
+            card.rate += 1
+            card.next_review_date = date.today() + timedelta(days=365)
+
+        if user_answer == "no":
             card.last_reply = False
             card.next_review_date = date.today() + timedelta(days=1)
         card.save()
