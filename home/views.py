@@ -188,3 +188,10 @@ class CardEditView(View):
         if form.is_valid():
             form.save()
         return redirect('home:cards')
+
+
+class CardsNewestView(View):
+    def get(self , request):
+        cards = FlashCard.objects.all().order_by("-created_at")
+        
+        return render(request, 'home/cards.html', {'cards': cards})
