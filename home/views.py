@@ -10,6 +10,7 @@ from datetime import timedelta, date
 from django.views import View
 from django.db.models import Q
 from .forms import CardCreateForm
+from django.contrib import messages
 
 
 class Home(APIView):
@@ -94,8 +95,6 @@ class CardsView(View):
         cards = FlashCard.objects.all()
         return render(request, "home/cards.html", {"cards": cards})
 
-    
-
 
 class CardDetialsView(View):
     def get(self, request, id):
@@ -143,16 +142,18 @@ class HomeView(View):
 
 class CardsWrongView(View):
     def get(self, request):
-        title  = 'wrong Cards'
+        title = "wrong Cards"
         cards = FlashCard.objects.filter(last_reply=False)
-        return render(request, "home/cards_wrong.html", {"cards": cards , "title": title})
+        return render(
+            request, "home/cards_wrong.html", {"cards": cards, "title": title}
+        )
 
 
 class CardCreatView(View):
     def get(self, request):
-        title  = 'Create Card'
+        title = "Create Card"
         form = CardCreateForm
-        return render(request, "home/card_create.html", {"form": form , 'title': title})
+        return render(request, "home/card_create.html", {"form": form, "title": title})
 
     def post(self, request):
         form = CardCreateForm(request.POST)
@@ -160,42 +161,50 @@ class CardCreatView(View):
             card = form.save(commit=False)
             card.next_review_date = date.today() + timedelta(days=1)
             card.save()
-            return redirect("home:cardnewest")
+            word = request.POST.get("word")
+            messages.success(request, f'Word "{word}" successfully saved.', "success")
+            return redirect("home:cardcreate")
 
 
 class CardsSearchView(View):
     def get(self, request):
-        query = request.GET.get("query", "")  # در صورتی که query وجود نداشته باشد، مقدار پیش‌فرض "" خواهد بود
+        query = request.GET.get(
+            "query", ""
+        )  # در صورتی که query وجود نداشته باشد، مقدار پیش‌فرض "" خواهد بود
         if query:
             cards = FlashCard.objects.filter(
-                Q(word__icontains=query) | 
-                Q(meaning__icontains=query) | 
-                Q(example__icontains=query)
+                Q(word__icontains=query)
+                | Q(meaning__icontains=query)
+                | Q(example__icontains=query)
             )
         else:
-            cards = FlashCard.objects.all()  
-        title  = 'Search Cards'
-        
-        return render(request, 'home/cards_search.html', {'cards': cards, 'title': title})
+            cards = FlashCard.objects.all()
+        title = "Search Cards"
+
+        return render(
+            request, "home/cards_search.html", {"cards": cards, "title": title}
+        )
 
 
 class CardEditView(View):
     def get(self, request, id):
-        card = get_object_or_404(FlashCard , id = id )
+        card = get_object_or_404(FlashCard, id=id)
         form = CardCreateForm(instance=card)
         title = "Edit Card"
-        return render(request, 'home/card_edit.html', {'form': form, 'card': card , 'title':title})
+        return render(
+            request, "home/card_edit.html", {"form": form, "card": card, "title": title}
+        )
 
-    def post(self , request , id ):
-        card = get_object_or_404(FlashCard , id = id )
-        form = CardCreateForm(request.POST ,instance=card )
+    def post(self, request, id):
+        card = get_object_or_404(FlashCard, id=id)
+        form = CardCreateForm(request.POST, instance=card)
         if form.is_valid():
             form.save()
-        return redirect('home:cards')
+        return redirect("home:cardnewest")
 
 
 class CardsNewestView(View):
-    def get(self , request):
+    def get(self, request):
         cards = FlashCard.objects.all().order_by("-created_at")
-        
-        return render(request, 'home/cards.html', {'cards': cards})
+
+        return render(request, "home/cards.html", {"cards": cards})
