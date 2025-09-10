@@ -160,7 +160,7 @@ class CardCreatView(View):
         if form.is_valid():
             card = form.save(commit=False)
             card.next_review_date = date.today() + timedelta(days=1)
-            # card.save()
+            card.save()
             word = request.POST.get("word")
             messages.success(request, f'Word "{word}" successfully saved.', "success")
             return redirect("home:cardcreate")
