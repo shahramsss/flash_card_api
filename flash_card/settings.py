@@ -25,9 +25,8 @@ SECRET_KEY = "django-insecure-e7jt*j59azw$srfdrmbxxv=djk7*zv=v1o!c9=+cp-hx@c)ftl
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-# ALLOWED_HOSTS = []
-ALLOWED_HOSTS = ['0.0.0.0', '127.0.0.1', '<IP_VM>']
-
+ALLOWED_HOSTS = []
+# ALLOWED_HOSTS = ["0.0.0.0", "127.0.0.1", "<IP_VM>"]
 
 
 # Application definition
@@ -41,8 +40,9 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     # local apps
     "home",
-    # third apps 
-    'rest_framework',
+    "reminder_date",
+    # third apps
+    "rest_framework",
 ]
 
 MIDDLEWARE = [
@@ -60,7 +60,7 @@ ROOT_URLCONF = "flash_card.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR/'templates'],
+        "DIRS": [BASE_DIR / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -122,10 +122,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = "static/"
-STATIC_ROOT =BASE_DIR.parent / "static"
+STATIC_ROOT = BASE_DIR.parent / "static"
 
 MEDIA_URL = "media/"
-MEDIA_ROOT =BASE_DIR.parent / "media"
+MEDIA_ROOT = BASE_DIR.parent / "media"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

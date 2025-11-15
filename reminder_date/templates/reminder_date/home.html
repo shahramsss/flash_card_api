@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block content %}
+  <p dir="rtl" class="h4">يادآور</p>
+  <ul class="list-group">
+    {% if reminders %}
+      {% for reminder in reminders %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          {{ reminder.title }}
+          <a href="{% url 'home:cardsdetails' card.id %}" class="btn btn-sm btn-primary">View</a>
+        </li>
+      {% endfor %}
+    {% else %}
+      <div dir="rtl" class="alert alert-warning alert-dismissible fade show" role="alert">
+        يادآوری وجود ندارد!
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endif %}
+  </ul>
+{% endblock %}
