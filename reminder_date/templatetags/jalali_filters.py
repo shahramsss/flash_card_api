@@ -14,7 +14,7 @@ def to_jalali(value):
     if not value:
         return ""
     try:
-        jalali_date = JalaliDate(value).strftime("%Y-%m-%d")
+        jalali_date = JalaliDate(value).strftime("%Y -%m -%d")
         return jalali_date.translate(EN_TO_FA_DIGITS)
     except Exception:
         return value

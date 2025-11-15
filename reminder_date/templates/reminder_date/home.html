@@ -1,13 +1,12 @@
 {% extends 'base.html' %}
 {% load jalali_filters %}
 {% block content %}
-  <p dir="rtl" class="h4">يادآور</p>
+  <p dir="rtl" class="h4">یادآور</p>
 
   <table class="table table-bordered table-striped table-hover text-center">
-    <thead class="table-dark">
+    <thead>
       <tr>
-        <th>عنوان</th>
-        <th>تاریخ شروع</th>
+        <th style="width:30%;">عنوان</th>
         <th>روز اول</th>
         <th>روز دوم</th>
         <th>روز هفتم</th>
@@ -18,8 +17,7 @@
     <tbody>
       {% for r in reminders %}
         <tr>
-          <td>{{ r.title }}</td>
-          <td>{{ r.start_day|to_jalali }}</td>
+          <td style="max-width:150px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ r.title }}</td>
 
           <td class="{% if r.one %}table-success{% endif %}">{{ r.one_date|to_jalali }}</td>
           <td class="{% if r.two %}table-success{% endif %}">{{ r.two_date|to_jalali }}</td>
