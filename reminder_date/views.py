@@ -1,7 +1,8 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from .models import Reminder
 from django.views import View
 from datetime import timedelta
+from .froms import ReminderForm
 
 
 class ReminderHomeView(View):
@@ -27,3 +28,16 @@ class ReminderHomeView(View):
             )
 
         return render(request, "reminder_date/home.html", {"reminders": context})
+
+
+class ReminderDetailsView(View):
+    form_class = ReminderForm
+
+    def get(self, request, pk):
+        reminder = get_object_or_404(Reminder, pk=pk)
+        form = self.form_class(instance=reminder)
+        return render(
+            request,
+            "reminder_date/reminderdetails.html",
+            {"reminder": reminder, "form": form},
+        )

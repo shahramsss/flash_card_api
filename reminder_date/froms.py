@@ -1,33 +1,29 @@
 from django import forms
+from .models import Reminder
 
-class ReminderForm(forms.Form):
-    title = forms.CharField(
-        max_length=512,
-        label="عنوان",
-        widget=forms.TextInput(attrs={'class': 'form-control'})
-    )
-    start_day = forms.DateField(
-        label="تاریخ شروع",
-        widget=forms.DateInput(attrs={'class': 'form-control', 'type': 'date'})
-    )
-    one = forms.DateField(
-        label="روز اول",
-        widget=forms.DateInput(attrs={'class': 'form-control', 'type': 'date'})
-    )
-    two = forms.DateField(
-        label="روز دوم",
-        widget=forms.DateInput(attrs={'class': 'form-control', 'type': 'date'})
-    )
-    seven = forms.DateField(
-        label="روز هفتم",
-        widget=forms.DateInput(attrs={'class': 'form-control', 'type': 'date'})
-    )
-    month = forms.DateField(
-        label="ماه",
-        widget=forms.DateInput(attrs={'class': 'form-control', 'type': 'date'})
-    )
-    year = forms.DateField(
-        label="سال",
-        widget=forms.DateInput(attrs={'class': 'form-control', 'type': 'date'})
-    )
-   
+
+class ReminderForm(forms.ModelForm):
+    class Meta:
+        model = Reminder
+        fields = ["title", "one", "two", "seven", "month", "year"]
+        widgets = {
+            "title": forms.TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "عنوان یادآور را وارد کنید",
+                }
+            ),
+            "one": forms.CheckboxInput(attrs={"class": "form-check-input"}),
+            "two": forms.CheckboxInput(attrs={"class": "form-check-input"}),
+            "seven": forms.CheckboxInput(attrs={"class": "form-check-input"}),
+            "month": forms.CheckboxInput(attrs={"class": "form-check-input"}),
+            "year": forms.CheckboxInput(attrs={"class": "form-check-input"}),
+        }
+        labels = {
+            "title": "عنوان یادآور",
+            "one": " روزاول",
+            "two": "روز دوم",
+            "seven": "روز هفتم",
+            "month": "ماه",
+            "year": "سال",
+        }
