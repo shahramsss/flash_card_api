@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from .models import Reminder
 from django.views import View
 from datetime import timedelta
@@ -35,7 +35,19 @@ class ReminderDetailsView(View):
 
     def get(self, request, pk):
         reminder = get_object_or_404(Reminder, pk=pk)
-        form = self.form_class(instance=reminder)   
+        form = self.form_class(instance=reminder)
+        return render(
+            request,
+            "reminder_date/reminderdetails.html",
+            {"reminder": reminder, "form": form},
+        )
+
+    def post(self, request, pk):
+        reminder = get_object_or_404(Reminder, pk=pk)
+        form = self.form_class(request.POST, instance=reminder)
+        if form.is_valid():
+            form.save()
+            return redirect("reminder:home")
         return render(
             request,
             "reminder_date/reminderdetails.html",
