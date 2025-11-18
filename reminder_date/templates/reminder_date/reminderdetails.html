@@ -2,10 +2,10 @@
 {% load jalali_filters %}
 {% block content %}
   <div dir="rtl">
-    <p dir="rtl" class="h4">یادآور</p>
+    <p dir="rtl " class="h4 mb-4">یادآور</p>
 
-    <p class="h5">{{ reminder.title }}</p>
     <p>تاریخ شروع: <span dir="ltr">{{ reminder.start_day|to_jalali }}</span></p>
+
 
 
     <form method="post">
@@ -15,31 +15,31 @@
             {{ form.title }}
         </div>
 
-        <!-- دکمه‌ها به جای چک‌باکس -->
-        <div class="d-grid gap-2 "> <!-- هر دکمه در یک خط -->
+        <!-- دکمه‌ها -->
+        <div class="d-flex flex-column  gap-2">
             <input type="checkbox" id="id_one" name="one" {% if reminder.one %}checked{% endif %} class="d-none">
-            <button type="button" class="btn {% if reminder.one %}btn-success{% else %}btn-outline-success{% endif %}" 
+            <button type="button" class="btn text-center {% if reminder.one %}btn-success{% else %}btn-outline-success{% endif %} w-25 text-end"
                     onclick="toggleCheckbox('id_one', this)">۱ روز</button>
 
             <input type="checkbox" id="id_two" name="two" {% if reminder.two %}checked{% endif %} class="d-none">
-            <button type="button" class="btn {% if reminder.two %}btn-success{% else %}btn-outline-success{% endif %}" 
+            <button type="button" class="btn text-center {% if reminder.two %}btn-success{% else %}btn-outline-success{% endif %} w-25 text-end"
                     onclick="toggleCheckbox('id_two', this)">۲ روز</button>
 
             <input type="checkbox" id="id_seven" name="seven" {% if reminder.seven %}checked{% endif %} class="d-none">
-            <button type="button" class="btn {% if reminder.seven %}btn-success{% else %}btn-outline-success{% endif %}" 
+            <button type="button" class="btn text-center {% if reminder.seven %}btn-success{% else %}btn-outline-success{% endif %} w-25 text-end"
                     onclick="toggleCheckbox('id_seven', this)">۷ روز</button>
 
             <input type="checkbox" id="id_month" name="month" {% if reminder.month %}checked{% endif %} class="d-none">
-            <button type="button" class="btn {% if reminder.month %}btn-success{% else %}btn-outline-success{% endif %}" 
+            <button type="button" class="btn text-center {% if reminder.month %}btn-success{% else %}btn-outline-success{% endif %} w-25 text-end"
                     onclick="toggleCheckbox('id_month', this)">ماه</button>
 
             <input type="checkbox" id="id_year" name="year" {% if reminder.year %}checked{% endif %} class="d-none">
-            <button type="button" class="btn {% if reminder.year %}btn-success{% else %}btn-outline-success{% endif %}" 
+            <button type="button" class="btn text-center {% if reminder.year %}btn-success{% else %}btn-outline-success{% endif %} w-25 text-end"
                     onclick="toggleCheckbox('id_year', this)">سال</button>
         </div>
 
         <br>
-        <button type="submit" class="btn btn-primary">ذخیره تغییرات</button>
+        <button type="submit" class="btn btn-info">ذخیره تغییرات</button>
     </form>
 
     <script>
@@ -55,7 +55,6 @@
             }
         }
     </script>
-
 
 
 {% endblock %}

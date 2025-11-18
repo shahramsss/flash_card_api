@@ -35,7 +35,7 @@ class ReminderDetailsView(View):
 
     def get(self, request, pk):
         reminder = get_object_or_404(Reminder, pk=pk)
-        form = self.form_class(instance=reminder)
+        form = self.form_class(instance=reminder)   
         return render(
             request,
             "reminder_date/reminderdetails.html",
