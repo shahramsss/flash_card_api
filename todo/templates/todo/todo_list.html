@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% load jalali_filters %}  <!-- فیلترهای جلالی که ساختیم -->
+{% load static %}
+{% load jalali_filters %}
+{% load static %}
+
+{% block content %}
+<div dir="rtl">
+ 
+  <h1 class="mb-4">وظایف</h1>
+
+  <table class="table table-bordered">
+    <thead class="table-light">
+      <tr>
+        <th>تاریخ (جلالی)</th>
+        <th>روز هفته</th>
+        <th>کارها</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for day, todos in days_dict.items %}
+        <tr class="{% if day|jalali_weekday == 'جمعه' %}table-danger{% endif %}">
+          <td>{{ day|to_jalali }}</td>
+          <td>{{ day|jalali_weekday }}</td>
+<td>
+  {% if todos %}
+    <div class="d-flex flex-wrap gap-2">
+      {% for todo in todos %}
+        <a href="#"
+           class="btn btn-sm
+             {% if todo.priority == 'high' %}
+               btn-danger
+             {% elif todo.priority == 'medium' %}
+               btn-warning
+             {% else %}
+               btn-success
+             {% endif %}
+           "
+           title="عنوان: {{ todo.title }}&#10;توضیحات: {{ todo.description }}&#10;ساعت: {{ todo.due_time }}">
+          {{ todo.title }}
+        </a>
+      {% endfor %}
+    </div>
+  {% else %}
+    <span class="text-muted">هیچ کاری ثبت نشده</span>
+  {% endif %}
+</td>
+
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <!-- فرم افزودن کار جدید -->
+  <form method="post" class="card p-3 mb-4 shadow-sm">
+    {% csrf_token %}
+    <div class="mb-3">
+      <label for="title" class="form-label">Task Title</label>
+      <input type="text" class="form-control" id="title" name="title" placeholder="Enter task title" required />
+    </div>
+
+    <div class="mb-3">
+      <label for="description" class="form-label">Description</label>
+      <textarea class="form-control" id="description" name="description" rows="3" placeholder="Optional description"></textarea>
+    </div>
+
+    <div class="row mb-3">
+      <div class="col">
+        <label for="due_date" class="form-label">Due Date</label>
+        <input type="date" class="form-control" id="due_date" name="due_date" />
+      </div>
+      <div class="col">
+        <label for="due_time" class="form-label">Due Time</label>
+        <input type="time" class="form-control" id="due_time" name="due_time" />
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label for="priority" class="form-label">Priority</label>
+      <select class="form-select" id="priority" name="priority">
+        <option value="low">Low</option>
+        <option value="medium" selected>Medium</option>
+        <option value="high">High</option>
+      </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Add Task</button>
+  </form>
+<script>
+  const timeInput = document.getElementById("due_time");
+  timeInput.addEventListener("change", function() {
+    let value = this.value; // مثلا "13:30"
+    console.log("ساعت انتخاب شده:", value); // همیشه ۲۴ ساعته ذخیره می‌شود
+  });
+</script>
+
+</div>
+{% endblock %}

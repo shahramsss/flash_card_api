@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     # local apps
     "home",
     "reminder_date",
+    "todo",
     # third apps
     "rest_framework",
 ]
