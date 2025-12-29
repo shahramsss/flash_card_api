@@ -21,6 +21,7 @@ from .views import *
 
 app_name = "todo"
 urlpatterns = [
-    path("todos/", TodoListView.as_view(), name="todo_list")
+    path("todos/", TodoListView.as_view(), name="todo_list"),
+    path("todos/<int:todo_id>", TodoDetailView.as_view(), name="todo_detail"),
 
 ]

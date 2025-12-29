@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+{% load jalali_filters %}
+{% load static %}
+
+{% block content %}
+<div class="container py-4" dir="rtl">
+
+  <!-- عنوان -->
+  <div class="mb-4">
+    <h3 class="fw-bold text-primary">✏️ ویرایش وظیفه</h3>
+  </div>
+
+  <!-- فرم ویرایش -->
+  <div class="card shadow-sm mb-5">
+    <div class="card-body">
+      <form method="post">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+
+        <div class="mb-3">
+          <label for="id_title" class="form-label fw-bold">عنوان</label>
+          {{ form.title }}
+        </div>
+
+        <div class="mb-3">
+          <label for="id_description" class="form-label fw-bold">توضیحات</label>
+          {{ form.description }}
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label for="id_due_date" class="form-label fw-bold">تاریخ سررسید</label>
+            {{ form.due_date }}
+          </div>
+          <div class="col-md-6">
+            <label for="id_due_time" class="form-label fw-bold">زمان سررسید</label>
+            {{ form.due_time }}
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="id_priority" class="form-label fw-bold">اولویت</label>
+          {{ form.priority }}
+        </div>
+
+        <div class="form-check form-switch mb-4">
+          {{ form.is_completed }}
+          <label class="form-check-label fw-bold" for="id_is_completed">
+            انجام شده
+          </label>
+        </div>
+
+        <div class="d-flex gap-2">
+          <button type="submit" class="btn btn-primary px-4">
+            💾 ذخیره تغییرات
+          </button>
+          <a href="{% url 'todo:todo_list' %}" class="btn btn-outline-secondary">
+            ↩ بازگشت
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- جزئیات وظیفه -->
+  <div class="card shadow-sm">
+    <div class="card-header bg-light fw-bold">
+      📌 جزئیات وظیفه
+    </div>
+
+    <div class="card-body">
+      <h4 class="text-primary mb-3">
+        {{ todo.title }}
+      </h4>
+
+      {% if todo.description %}
+        <p class="text-muted">
+          {{ todo.description }}
+        </p>
+      {% else %}
+        <p class="text-muted fst-italic">
+          توضیحی ثبت نشده
+        </p>
+      {% endif %}
+
+      <div class="mb-3">
+        <strong>وضعیت:</strong>
+        {% if todo.is_completed %}
+          <span class="badge bg-success ms-2">انجام شده ✅</span>
+        {% else %}
+          <span class="badge bg-warning text-dark ms-2">در حال انجام ⏳</span>
+        {% endif %}
+      </div>
+
+      <ul class="list-group list-group-flush mb-3">
+        <li class="list-group-item">
+          <strong>تاریخ ایجاد:</strong>
+          {{ todo.created_at|to_jalali }}
+        </li>
+        <li class="list-group-item">
+          <strong>آخرین بروزرسانی:</strong>
+          {{ todo.updated_at|to_jalali }}
+        </li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

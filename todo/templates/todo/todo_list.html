@@ -1,98 +1,184 @@
 {% extends 'base.html' %}
-{% load jalali_filters %}  <!-- فیلترهای جلالی که ساختیم -->
-{% load static %}
 {% load jalali_filters %}
 {% load static %}
 
 {% block content %}
-<div dir="rtl">
- 
-  <h1 class="mb-4">وظایف</h1>
+<div class="container py-4" dir="rtl">
 
-  <table class="table table-bordered">
-    <thead class="table-light">
-      <tr>
-        <th>تاریخ (جلالی)</th>
-        <th>روز هفته</th>
-        <th>کارها</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for day, todos in days_dict.items %}
-        <tr class="{% if day|jalali_weekday == 'جمعه' %}table-danger{% endif %}">
-          <td>{{ day|to_jalali }}</td>
-          <td>{{ day|jalali_weekday }}</td>
-<td>
-  {% if todos %}
-    <div class="d-flex flex-wrap gap-2">
-      {% for todo in todos %}
-        <a href="#"
-           class="btn btn-sm
-             {% if todo.priority == 'high' %}
-               btn-danger
-             {% elif todo.priority == 'medium' %}
-               btn-warning
-             {% else %}
-               btn-success
-             {% endif %}
-           "
-           title="عنوان: {{ todo.title }}&#10;توضیحات: {{ todo.description }}&#10;ساعت: {{ todo.due_time }}">
-          {{ todo.title }}
-        </a>
-      {% endfor %}
-    </div>
-  {% else %}
-    <span class="text-muted">هیچ کاری ثبت نشده</span>
-  {% endif %}
-</td>
+  <!-- عنوان -->
+  <div class="mb-4">
+    <h3 class="fw-bold">📋 وظایف من</h3>
+  </div>
 
-        </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+  <!-- تب‌ها -->
+  <ul class="nav nav-tabs mb-4" id="todoTabs" role="tablist">
 
-  <!-- فرم افزودن کار جدید -->
-  <form method="post" class="card p-3 mb-4 shadow-sm">
-    {% csrf_token %}
-    <div class="mb-3">
-      <label for="title" class="form-label">Task Title</label>
-      <input type="text" class="form-control" id="title" name="title" placeholder="Enter task title" required />
-    </div>
+    <!-- ۱۴ روز -->
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active"
+              id="days-tab"
+              data-bs-toggle="tab"
+              data-bs-target="#days"
+              type="button">
+        📅 ۱۴ روز آینده
+      </button>
+    </li>
 
-    <div class="mb-3">
-      <label for="description" class="form-label">Description</label>
-      <textarea class="form-control" id="description" name="description" rows="3" placeholder="Optional description"></textarea>
-    </div>
+    <!-- آینده -->
+    <li class="nav-item" role="presentation">
+      <button class="nav-link"
+              id="future-tab"
+              data-bs-toggle="tab"
+              data-bs-target="#future"
+              type="button">
+        ⏳ کارهای آینده
+        {% if future_todos %}
+          <span class="badge bg-warning text-dark ms-1">{{ future_todos|length }}</span>
+        {% endif %}
+      </button>
+    </li>
 
-    <div class="row mb-3">
-      <div class="col">
-        <label for="due_date" class="form-label">Due Date</label>
-        <input type="date" class="form-control" id="due_date" name="due_date" />
+    <!-- ثبت -->
+    <li class="nav-item ms-auto" role="presentation">
+      <button class="nav-link text-success"
+              id="create-tab"
+              data-bs-toggle="tab"
+              data-bs-target="#create"
+              type="button">
+        ➕ ثبت وظیفه
+      </button>
+    </li>
+
+  </ul>
+
+  <!-- محتوای تب‌ها -->
+  <div class="tab-content">
+
+    <!-- تب ۱۴ روز -->
+    <div class="tab-pane fade show active" id="days">
+      <div class="table-responsive shadow-sm rounded">
+        <table class="table table-bordered align-middle mb-0">
+          <thead class="table-light text-center">
+            <tr>
+              <th style="width:140px;">تاریخ</th>
+              <th style="width:120px;">روز</th>
+              <th>کارها</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for day, todos in days_dict.items %}
+            <tr class="{% if day|jalali_weekday == 'جمعه' %}table-danger{% endif %}">
+              <td class="text-center fw-bold">{{ day|to_jalali }}</td>
+              <td class="text-center">{{ day|jalali_weekday }}</td>
+              <td>
+                {% if todos %}
+                  <div class="d-flex flex-wrap gap-2">
+                    {% for todo in todos %}
+                      <a href="{% url 'todo:todo_detail' todo.id %}"
+                         class="btn btn-sm
+                         {% if todo.is_completed %}
+                           btn-success text-decoration-line-through
+                         {% elif todo.priority == 'high' %}
+                           btn-danger
+                         {% elif todo.priority == 'medium' %}
+                           btn-warning
+                         {% else %}
+                           btn-info
+                         {% endif %}
+                         ">
+                        {{ todo.title }}
+                      </a>
+                    {% endfor %}
+                  </div>
+                {% else %}
+                  <span class="text-muted">— کاری ثبت نشده</span>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
       </div>
-      <div class="col">
-        <label for="due_time" class="form-label">Due Time</label>
-        <input type="time" class="form-control" id="due_time" name="due_time" />
+    </div>
+
+    <!-- تب آینده -->
+    <div class="tab-pane fade" id="future">
+      {% if future_todos %}
+        <div class="list-group shadow-sm">
+          {% for todo in future_todos %}
+            <a href="{% url 'todo:todo_detail' todo.id %}"
+               class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+              <div>
+                <span class="badge me-2
+                  {% if todo.priority == 'high' %}bg-danger
+                  {% elif todo.priority == 'medium' %}bg-warning text-dark
+                  {% else %}bg-info{% endif %}
+                ">
+                  {{ todo.get_priority_display }}
+                </span>
+                {{ todo.title }}
+              </div>
+              <small class="text-muted">{{ todo.due_date|to_jalali }}</small>
+            </a>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="alert alert-light text-center">
+          🎉 کاری برای آینده وجود ندارد
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- تب ثبت وظیفه -->
+    <div class="tab-pane fade" id="create">
+      <div class="card shadow-sm">
+        <div class="card-body">
+
+          <form method="post">
+            {% csrf_token %}
+
+            <div class="mb-3">
+              <label class="form-label fw-bold">عنوان</label>
+              <input type="text" name="title" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-bold">توضیحات</label>
+              <textarea name="description" rows="3" class="form-control"></textarea>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label class="form-label fw-bold">تاریخ انجام</label>
+                <input type="date" name="due_date" class="form-control">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-bold">ساعت</label>
+                <input type="time" name="due_time" class="form-control">
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-bold">اولویت</label>
+              <select name="priority" class="form-select">
+                <option value="low">کم</option>
+                <option value="medium" selected>متوسط</option>
+                <option value="high">زیاد</option>
+              </select>
+            </div>
+
+            <div class="text-end">
+              <button type="submit" class="btn btn-primary px-4">
+                 ثبت وظیفه
+              </button>
+            </div>
+
+          </form>
+
+        </div>
       </div>
     </div>
 
-    <div class="mb-3">
-      <label for="priority" class="form-label">Priority</label>
-      <select class="form-select" id="priority" name="priority">
-        <option value="low">Low</option>
-        <option value="medium" selected>Medium</option>
-        <option value="high">High</option>
-      </select>
-    </div>
-
-    <button type="submit" class="btn btn-primary">Add Task</button>
-  </form>
-<script>
-  const timeInput = document.getElementById("due_time");
-  timeInput.addEventListener("change", function() {
-    let value = this.value; // مثلا "13:30"
-    console.log("ساعت انتخاب شده:", value); // همیشه ۲۴ ساعته ذخیره می‌شود
-  });
-</script>
-
+  </div>
 </div>
 {% endblock %}
