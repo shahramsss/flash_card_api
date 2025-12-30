@@ -37,6 +37,19 @@
         {% endif %}
       </button>
     </li>
+    <!-- تب کارهای روزانه -->
+    <li class="nav-item" role="presentation">
+      <button class="nav-link"
+              id="daily-tab"
+              data-bs-toggle="tab"
+              data-bs-target="#daily"
+              type="button">
+        🌞 کارهای روزانه
+        {% if daily_todos %}
+          <span class="badge bg-info ms-1">{{ daily_todos|length }}</span>
+        {% endif %}
+      </button>
+    </li>
 
     <!-- ثبت -->
     <li class="nav-item ms-auto" role="presentation">
@@ -48,11 +61,37 @@
         ➕ ثبت وظیفه
       </button>
     </li>
-
   </ul>
 
   <!-- محتوای تب‌ها -->
   <div class="tab-content">
+    <!-- محتوا تب کارهای روزانه -->
+<div class="tab-pane fade" id="daily">
+  {% if daily_todos %}
+    <div class="list-group shadow-sm">
+      {% for todo in daily_todos %}
+        <a href="{% url 'todo:todo_detail' todo.id %}"
+           class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+          <div>
+            <span class="badge me-2
+              {% if todo.priority == 'high' %}bg-danger
+              {% elif todo.priority == 'medium' %}bg-warning text-dark
+              {% else %}bg-info{% endif %}
+            ">
+              {{ todo.get_priority_display }}
+            </span>
+            {{ todo.title }}
+          </div>
+          <small class="text-muted">{{ todo.due_date|to_jalali }}</small>
+        </a>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="alert alert-light text-center">
+      🎉 کار روزانه‌ای ثبت نشده
+    </div>
+  {% endif %}
+</div>
 
     <!-- تب ۱۴ روز -->
     <div class="tab-pane fade show active" id="days">
@@ -130,54 +169,64 @@
     </div>
 
     <!-- تب ثبت وظیفه -->
-    <div class="tab-pane fade" id="create">
-      <div class="card shadow-sm">
-        <div class="card-body">
+<div class="tab-pane fade" id="create">
+  <div class="card shadow-sm">
+    <div class="card-body">
 
-          <form method="post">
-            {% csrf_token %}
+      <form method="post">
+        {% csrf_token %}
 
-            <div class="mb-3">
-              <label class="form-label fw-bold">عنوان</label>
-              <input type="text" name="title" class="form-control" required>
-            </div>
-
-            <div class="mb-3">
-              <label class="form-label fw-bold">توضیحات</label>
-              <textarea name="description" rows="3" class="form-control"></textarea>
-            </div>
-
-            <div class="row mb-3">
-              <div class="col-md-6">
-                <label class="form-label fw-bold">تاریخ انجام</label>
-                <input type="date" name="due_date" class="form-control">
-              </div>
-              <div class="col-md-6">
-                <label class="form-label fw-bold">ساعت</label>
-                <input type="time" name="due_time" class="form-control">
-              </div>
-            </div>
-
-            <div class="mb-3">
-              <label class="form-label fw-bold">اولویت</label>
-              <select name="priority" class="form-select">
-                <option value="low">کم</option>
-                <option value="medium" selected>متوسط</option>
-                <option value="high">زیاد</option>
-              </select>
-            </div>
-
-            <div class="text-end">
-              <button type="submit" class="btn btn-primary px-4">
-                 ثبت وظیفه
-              </button>
-            </div>
-
-          </form>
-
+        <div class="mb-3">
+          <label class="form-label fw-bold">عنوان</label>
+          {{ form.title }}
         </div>
-      </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-bold">توضیحات</label>
+          {{ form.description }}
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-md-4">
+            <label class="form-label fw-bold">تاریخ انجام</label>
+            {{ form.due_date }}
+          </div>
+          <div class="col-md-4">
+            <label class="form-label fw-bold">ساعت شروع</label>
+            {{ form.start_time }}
+          </div>
+          <div class="col-md-4">
+            <label class="form-label fw-bold">ساعت پایان</label>
+            {{ form.end_time }}
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-bold">اولویت</label>
+          {{ form.priority }}
+        </div>
+
+        <div class="form-check form-switch mb-3">
+          {{ form.is_completed }}
+          <label class="form-check-label fw-bold">انجام شده</label>
+        </div>
+        <div class="form-check form-switch mb-3">
+            {{ form.is_daily }}
+            <label class="form-check-label fw-bold" for="{{ form.is_daily.id_for_label }}">
+                اضافه به کارهای روزانه
+            </label>
+        </div>
+
+        <div class="text-end">
+          <button type="submit" class="btn btn-primary px-4">
+            ثبت وظیفه
+          </button>
+        </div>
+      </form>
+
     </div>
+  </div>
+</div>
 
   </div>
 </div>

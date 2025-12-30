@@ -6,21 +6,28 @@ from .forms import TodoForm
 
 
 class TodoListView(View):
+    form_class = TodoForm
+
     def get(self, request):
         today = date.today()
+        form = self.form_class()
 
         # ۱۴ روز آینده (شامل امروز)
         days = [today + timedelta(days=i) for i in range(14)]
 
         # دیکشنری روزها و کارها
         days_dict = {
-            day: Todo.objects.filter(due_date=day).order_by("due_time") for day in days
+            day: Todo.objects.filter(due_date=day).order_by("start_time")
+            for day in days
         }
 
         # کارهای آینده (بعد از امروز)
         future_todos = Todo.objects.filter(
             due_date__gt=today, is_completed=False
-        ).order_by("due_date", "due_time")
+        ).order_by("due_date", "start_time")
+        daily_todos = Todo.objects.filter(
+            is_daily=True,
+        )
 
         return render(
             request,
@@ -28,43 +35,39 @@ class TodoListView(View):
             {
                 "days_dict": days_dict,
                 "future_todos": future_todos,
+                "form": form,
+                "daily_todos": daily_todos,
             },
         )
 
     def post(self, request):
-        title = request.POST.get("title")
-        description = request.POST.get("description")
-        due_date = request.POST.get("due_date")
-        due_time = request.POST.get("due_time")
-        priority = request.POST.get("priority", "medium")
+        form = self.form_class(request.POST)
 
-        if title:
-            Todo.objects.create(
-                title=title,
-                description=description,
-                due_date=due_date or None,
-                due_time=due_time or None,
-                priority=priority,
-            )
-        return redirect("todo:todo_list")
+        if form.is_valid():
+            form.save()
+            return redirect("todo:todo_list")
 
+        # اگر فرم نامعتبر بود، همون صفحه با خطا برگرده
+        today = date.today()
+        days = [today + timedelta(days=i) for i in range(14)]
 
-class TodoUpdateView(View):
-    def get(self, request, todo_id):
-        todo = get_object_or_404(Todo, pk=pk)
-        return render(request, "todo_edit.html", {"todo": todo})
+        days_dict = {
+            day: Todo.objects.filter(due_date=day).order_by("start_time")
+            for day in days
+        }
 
-    def post(self, request, pk):
-        todo = get_object_or_404(Todo, pk=pk)
-        todo.title = request.POST.get("title")
-        todo.description = request.POST.get("description")
-        todo.due_date = request.POST.get("due_date") or None
-        todo.due_time = request.POST.get("due_time") or None
-        todo.priority = request.POST.get("priority", "medium")
-        todo.is_completed = bool(request.POST.get("is_completed"))
-        todo.save()
-        return redirect(
-            "todo:todo_list",
+        future_todos = Todo.objects.filter(
+            due_date__gt=today, is_completed=False
+        ).order_by("due_date", "start_time")
+
+        return render(
+            request,
+            "todo/todo_list.html",
+            {
+                "days_dict": days_dict,
+                "future_todos": future_todos,
+                "form": form,
+            },
         )
 
 
@@ -87,8 +90,12 @@ class TodoDetailView(View):
         return render(request, "todo/todo_detail.html", {"todo": todo, "form": form})
 
 
-# class TodoFuturView(view):
-#     def get(self , request):
-#         today = date.today()
-#         todo = get_object_or_404(Todo, pk=todo_id, due_date__gte=today)
-#         return render()
+class TodoDailyView(View):
+    def get(self, request, todo_id):
+        todo = get_object_or_404(Todo, id=todo_id)
+        Todo.objects.create(
+            title=todo.title,
+            description=todo.description,
+            due_date=date.today(),
+            start_time=datetime.now(),
+        )
