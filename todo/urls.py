@@ -23,5 +23,8 @@ app_name = "todo"
 urlpatterns = [
     path("todos/", TodoListView.as_view(), name="todo_list"),
     path("todos/<int:todo_id>", TodoDetailView.as_view(), name="todo_detail"),
+    path("todo_daily_confirm/<int:todo_id>", TodoDailyView.as_view(), name="todo_daily_confirm"),
+    path("todo/delete/<int:todo_id>/",TodoDeleteView.as_view(),name="todo_delete"),
+
 
 ]

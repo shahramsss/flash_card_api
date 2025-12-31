@@ -83,7 +83,7 @@
   {% if daily_todos %}
     <div class="list-group shadow-sm">
       {% for todo in daily_todos %}
-        <a href="{% url 'todo:todo_detail' todo.id %}"
+        <a href="{% url 'todo:todo_daily_confirm' todo.id %}"
            class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
           <div>
             <span class="badge me-2

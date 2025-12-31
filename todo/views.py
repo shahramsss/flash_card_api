@@ -3,7 +3,7 @@ from django.views import View
 from .models import Todo
 from datetime import date, timedelta
 from .forms import TodoForm
-
+from django.utils import timezone
 
 class TodoListView(View):
     form_class = TodoForm
@@ -96,11 +96,33 @@ class TodoDetailView(View):
 
 
 class TodoDailyView(View):
+
     def get(self, request, todo_id):
-        todo = get_object_or_404(Todo, id=todo_id)
-        Todo.objects.create(
+        todo = get_object_or_404(Todo, id=todo_id,)
+        return render(request, "todo/todo_confirm.html", {"todo": todo})
+
+    def post(self, request, todo_id):
+        todo = get_object_or_404(Todo, id=todo_id,)
+
+        new_daily_todo = Todo.objects.create(
             title=todo.title,
             description=todo.description,
             due_date=date.today(),
-            start_time=datetime.now(),
+            start_time = timezone.localtime().time(),
+            priority=todo.priority,
+            is_daily=False,
+            is_completed=False,
         )
+
+        return redirect("todo:todo_detail", new_daily_todo.id)
+
+
+class TodoDeleteView(View):
+    def get(self, request, todo_id):
+        todo = get_object_or_404(Todo, id=todo_id)
+        return render(request, "todo/todo_delete_confirm.html", {"todo": todo})
+
+    def post(self, request, todo_id):
+        todo = get_object_or_404(Todo, id=todo_id)
+        todo.delete()
+        return redirect("todo:todo_list")

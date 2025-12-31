@@ -3,6 +3,29 @@ from .models import Todo
 
 
 class TodoForm(forms.ModelForm):
+    start_time = forms.TimeField(
+        required=False,
+        input_formats=["%H:%M"],
+        widget=forms.TimeInput(
+            format="%H:%M",
+            attrs={
+                "type": "time",
+                "class": "form-control",
+            }
+        ),
+    )
+
+    end_time = forms.TimeField(
+        required=False,
+        input_formats=["%H:%M"],
+        widget=forms.TimeInput(
+            format="%H:%M",
+            attrs={
+                "type": "time",
+                "class": "form-control",
+            }
+        ),
+    )
     class Meta:
         model = Todo
         fields = [
