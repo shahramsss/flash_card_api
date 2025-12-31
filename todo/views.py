@@ -28,6 +28,10 @@ class TodoListView(View):
         daily_todos = Todo.objects.filter(
             is_daily=True,
         )
+        past_todos = Todo.objects.filter(
+            due_date__lt=today,
+            is_completed=False,
+        ).order_by("-due_date")
 
         return render(
             request,
@@ -37,6 +41,7 @@ class TodoListView(View):
                 "future_todos": future_todos,
                 "form": form,
                 "daily_todos": daily_todos,
+                "past_todos": past_todos,
             },
         )
 
