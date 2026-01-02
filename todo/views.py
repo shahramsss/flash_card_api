@@ -1,12 +1,13 @@
 from django.shortcuts import render, redirect, get_object_or_404, get_list_or_404
 from django.views import View
 from .models import Todo
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 from .forms import TodoForm
 from django.utils import timezone
 from collections import defaultdict
-from django.db.models import F, ExpressionWrapper, DurationField, Sum
+from django.db.models import F, ExpressionWrapper, DurationField, Sum, Count
 from django.db.models.functions import ExtractWeek, ExtractMonth
+from collections import defaultdict
 
 
 class TodoListView(View):
@@ -142,7 +143,7 @@ class TodoDeleteView(View):
         return redirect("todo:todo_list")
 
 
-class DailySummaryTime(View):
+class DailySummaryTimeView(View):
     """
     نمایش جمع زمان صرف شده روی یک کار روزانه مشخص
     - گروه‌بندی بر اساس هفته و ماه
@@ -150,7 +151,7 @@ class DailySummaryTime(View):
 
     def get(self, request, todo_id):
         # گرفتن وظیفه‌ی روزانه
-        todo = get_object_or_404(Todo, id=todo_id, is_daily=True)
+        todo = get_object_or_404(Todo, id=todo_id)
 
         # همه‌ی وظایف با همان عنوان (کارهای روزانه مشابه)
         todos = Todo.objects.filter(
@@ -158,46 +159,31 @@ class DailySummaryTime(View):
             start_time__isnull=False,
             end_time__isnull=False,
             due_date__isnull=False,
-        ).annotate(
-            # محاسبه duration به صورت timedelta
-            duration=ExpressionWrapper(
-                (F("end_time") - F("start_time")), output_field=DurationField()
-            ),
-            week=ExtractWeek("due_date"),
-            month=ExtractMonth("due_date"),
+            is_completed=True,
         )
-        # جمع زمان بر اساس هفته
-        weekly_summary = (
-            todos.values("week").annotate(total=Sum("duration")).order_by("week")
-        )
+        todo_times = {"weeks": {}}
 
-        # جمع زمان بر اساس ماه
-        monthly_summary = (
-            todos.values("month").annotate(total=Sum("duration")).order_by("month")
-        )
+        for t in todos:
+            week = t.due_date.isocalendar().week
+            # محاسبه مدت زمان هر کار
+            start = datetime.combine(t.due_date, t.start_time)
+            end = datetime.combine(t.due_date, t.end_time)
+            if week in todo_times["weeks"]:
+                todo_times["weeks"][int(week)]["duration"] += end - start
+            else:
+                todo_times["weeks"][int(week)] = {
+                    "title": t.title,
+                    "duration": (end - start),
+                }
 
-        # تبدیل duration به ساعت و دقیقه برای template
-        def format_duration(total):
-            if not total:
-                return {"hours": 0, "minutes": 0}
-            total_seconds = total.total_seconds()
-            hours = int(total_seconds // 3600)
-            minutes = int((total_seconds % 3600) // 60)
-            return {"hours": hours, "minutes": minutes}
+        print("*" * 90)
+        for key, value in todo_times["weeks"].items():
+            print(key, value["duration"])
 
-        weekly_summary_formatted = [
-            {**item, **format_duration(item["total"])} for item in weekly_summary
-        ]
-        monthly_summary_formatted = [
-            {**item, **format_duration(item["total"])} for item in monthly_summary
-        ]
+        print(todo_times)
 
         return render(
             request,
             "todo/daily_summary_time.html",
-            {
-                "todo": todo.title,
-                "weekly_summary": weekly_summary_formatted,
-                "monthly_summary": monthly_summary_formatted,
-            },
+            {"todo_times": todo_times , "todo":todo},
         )
