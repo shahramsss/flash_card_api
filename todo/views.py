@@ -4,6 +4,10 @@ from .models import Todo
 from datetime import date, timedelta
 from .forms import TodoForm
 from django.utils import timezone
+from collections import defaultdict
+from django.db.models import F, ExpressionWrapper, DurationField, Sum
+from django.db.models.functions import ExtractWeek, ExtractMonth
+
 
 class TodoListView(View):
     form_class = TodoForm
@@ -32,6 +36,10 @@ class TodoListView(View):
             due_date__lt=today,
             is_completed=False,
         ).order_by("-due_date")
+
+        #  sum totla time daily
+
+        todos_totla_time = Todo.objects.filter
 
         return render(
             request,
@@ -98,17 +106,23 @@ class TodoDetailView(View):
 class TodoDailyView(View):
 
     def get(self, request, todo_id):
-        todo = get_object_or_404(Todo, id=todo_id,)
+        todo = get_object_or_404(
+            Todo,
+            id=todo_id,
+        )
         return render(request, "todo/todo_confirm.html", {"todo": todo})
 
     def post(self, request, todo_id):
-        todo = get_object_or_404(Todo, id=todo_id,)
+        todo = get_object_or_404(
+            Todo,
+            id=todo_id,
+        )
 
         new_daily_todo = Todo.objects.create(
             title=todo.title,
             description=todo.description,
             due_date=date.today(),
-            start_time = timezone.localtime().time(),
+            start_time=timezone.localtime().time(),
             priority=todo.priority,
             is_daily=False,
             is_completed=False,
@@ -126,3 +140,64 @@ class TodoDeleteView(View):
         todo = get_object_or_404(Todo, id=todo_id)
         todo.delete()
         return redirect("todo:todo_list")
+
+
+class DailySummaryTime(View):
+    """
+    نمایش جمع زمان صرف شده روی یک کار روزانه مشخص
+    - گروه‌بندی بر اساس هفته و ماه
+    """
+
+    def get(self, request, todo_id):
+        # گرفتن وظیفه‌ی روزانه
+        todo = get_object_or_404(Todo, id=todo_id, is_daily=True)
+
+        # همه‌ی وظایف با همان عنوان (کارهای روزانه مشابه)
+        todos = Todo.objects.filter(
+            title=todo.title,
+            start_time__isnull=False,
+            end_time__isnull=False,
+            due_date__isnull=False,
+        ).annotate(
+            # محاسبه duration به صورت timedelta
+            duration=ExpressionWrapper(
+                (F("end_time") - F("start_time")), output_field=DurationField()
+            ),
+            week=ExtractWeek("due_date"),
+            month=ExtractMonth("due_date"),
+        )
+        # جمع زمان بر اساس هفته
+        weekly_summary = (
+            todos.values("week").annotate(total=Sum("duration")).order_by("week")
+        )
+
+        # جمع زمان بر اساس ماه
+        monthly_summary = (
+            todos.values("month").annotate(total=Sum("duration")).order_by("month")
+        )
+
+        # تبدیل duration به ساعت و دقیقه برای template
+        def format_duration(total):
+            if not total:
+                return {"hours": 0, "minutes": 0}
+            total_seconds = total.total_seconds()
+            hours = int(total_seconds // 3600)
+            minutes = int((total_seconds % 3600) // 60)
+            return {"hours": hours, "minutes": minutes}
+
+        weekly_summary_formatted = [
+            {**item, **format_duration(item["total"])} for item in weekly_summary
+        ]
+        monthly_summary_formatted = [
+            {**item, **format_duration(item["total"])} for item in monthly_summary
+        ]
+
+        return render(
+            request,
+            "todo/daily_summary_time.html",
+            {
+                "todo": todo.title,
+                "weekly_summary": weekly_summary_formatted,
+                "monthly_summary": monthly_summary_formatted,
+            },
+        )

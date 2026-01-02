@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container py-5" dir="rtl">
+  <h3 class="mb-4">⏱ گزارش زمان صرف شده برای "{{ todo }}"</h3>
+
+  <h5 class="mt-4">💼 بر اساس هفته</h5>
+  {% if weekly_summary %}
+    <ul class="list-group mb-3">
+      {% for item in weekly_summary %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          هفته {{ item.week }}
+          <span class="badge bg-info">{{ item.hours }} ساعت و {{ item.minutes }} دقیقه</span>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <div class="alert alert-light text-center">🎉 هیچ زمان صرف شده‌ای برای این کار ثبت نشده</div>
+  {% endif %}
+
+  <h5 class="mt-4">📅 بر اساس ماه</h5>
+  {% if monthly_summary %}
+    <ul class="list-group mb-3">
+      {% for item in monthly_summary %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          ماه {{ item.month }}
+          <span class="badge bg-info">{{ item.hours }} ساعت و {{ item.minutes }} دقیقه</span>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <div class="alert alert-light text-center">🎉 هیچ زمان صرف شده‌ای برای این کار ثبت نشده</div>
+  {% endif %}
+</div>
+{% endblock %}

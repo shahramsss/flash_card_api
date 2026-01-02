@@ -11,7 +11,7 @@ class TodoForm(forms.ModelForm):
             attrs={
                 "type": "time",
                 "class": "form-control",
-            }
+            },
         ),
     )
 
@@ -23,9 +23,10 @@ class TodoForm(forms.ModelForm):
             attrs={
                 "type": "time",
                 "class": "form-control",
-            }
+            },
         ),
     )
+
     class Meta:
         model = Todo
         fields = [
@@ -54,6 +55,7 @@ class TodoForm(forms.ModelForm):
             "is_completed": forms.CheckboxInput(attrs={"class": "form-check-input"}),
             "is_daily": forms.CheckboxInput(attrs={"class": "form-check-input"}),
         }
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["due_date"].required = True
