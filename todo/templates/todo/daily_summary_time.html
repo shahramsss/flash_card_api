@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="container py-5" dir="rtl">
-  <h3 class="mb-4">⏱ گزارش زمان صرف شده برای "{{ todo.title }}"</h3>
+  <h4 class="mb-4">⏱ گزارش زمان صرف شده برای "<span class="text-primary">{{ todo.title }}</span>"  براساس تاریخ شمسی</h4>
 
   <h5 class="mt-4">💼 بر اساس هفته</h5>
   {% if todo_times.weeks %}

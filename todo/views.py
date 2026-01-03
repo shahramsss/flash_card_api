@@ -8,6 +8,7 @@ from collections import defaultdict
 from django.db.models import F, ExpressionWrapper, DurationField, Sum, Count
 from django.db.models.functions import ExtractWeek, ExtractMonth
 from collections import defaultdict
+import jdatetime
 
 
 class TodoListView(View):
@@ -164,9 +165,17 @@ class SummaryTimeView(View):
         todo_times = {"weeks": {}, "months": {}}
 
         for t in todos:
-            iso = t.due_date.isocalendar()
-            week_key = f"{iso.year}-{iso.week}"
-            month_key = f"{t.due_date.year}-{t.due_date.month}"
+            # miladi date 
+            # iso = t.due_date.isocalendar()
+            # week_key = f"{iso.year}-{iso.week}"
+            # month_key = f"{t.due_date.year}-{t.due_date.month}"
+
+            # jalali date 
+            j_date = jdatetime.date.fromgregorian(date=t.due_date)
+            jalali_year = j_date.year
+            month_key = j_date.month
+            start_of_year = jdatetime.date(jalali_year, 1, 1)
+            week_key = ((j_date - start_of_year).days // 7) + 1
 
             start = datetime.combine(t.due_date, t.start_time)
             end = datetime.combine(t.due_date, t.end_time)
