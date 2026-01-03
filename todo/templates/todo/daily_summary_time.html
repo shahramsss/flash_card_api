@@ -18,12 +18,12 @@
   {% endif %}
 
   <h5 class="mt-4">📅 بر اساس ماه</h5>
-  {% if monthly_summary %}
+  {% if todo_times.months %}
     <ul class="list-group mb-3">
-      {% for item in monthly_summary %}
+      {% for key , value in todo_times.months.items %}
         <li class="list-group-item d-flex justify-content-between align-items-center">
-          ماه {{ item.month }}
-          <span class="badge bg-info">{{ item.hours }} ساعت و {{ item.minutes }} دقیقه</span>
+          ماه {{ key }}
+          <span class="">{{ value.duration }}</span>
         </li>
       {% endfor %}
     </ul>

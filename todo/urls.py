@@ -25,7 +25,7 @@ urlpatterns = [
     path("todos/<int:todo_id>/", TodoDetailView.as_view(), name="todo_detail"),
     path("todo_daily_confirm/<int:todo_id>/", TodoDailyView.as_view(), name="todo_daily_confirm"),
     path("todo/delete/<int:todo_id>/",TodoDeleteView.as_view(),name="todo_delete"),
-    path("summary/time/<int:todo_id>/", DailySummaryTimeView.as_view(), name="daily_summary_time"),
+    path("summary/time/<int:todo_id>/", SummaryTimeView.as_view(), name="summary_time"),
 
 
 ]

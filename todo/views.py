@@ -143,17 +143,16 @@ class TodoDeleteView(View):
         return redirect("todo:todo_list")
 
 
-class DailySummaryTimeView(View):
+
+class SummaryTimeView(View):
     """
     نمایش جمع زمان صرف شده روی یک کار روزانه مشخص
     - گروه‌بندی بر اساس هفته و ماه
     """
 
     def get(self, request, todo_id):
-        # گرفتن وظیفه‌ی روزانه
         todo = get_object_or_404(Todo, id=todo_id)
 
-        # همه‌ی وظایف با همان عنوان (کارهای روزانه مشابه)
         todos = Todo.objects.filter(
             title=todo.title,
             start_time__isnull=False,
@@ -161,29 +160,38 @@ class DailySummaryTimeView(View):
             due_date__isnull=False,
             is_completed=True,
         )
-        todo_times = {"weeks": {}}
+
+        todo_times = {"weeks": {}, "months": {}}
 
         for t in todos:
-            week = t.due_date.isocalendar().week
-            # محاسبه مدت زمان هر کار
+            iso = t.due_date.isocalendar()
+            week_key = f"{iso.year}-{iso.week}"
+            month_key = f"{t.due_date.year}-{t.due_date.month}"
+
             start = datetime.combine(t.due_date, t.start_time)
             end = datetime.combine(t.due_date, t.end_time)
-            if week in todo_times["weeks"]:
-                todo_times["weeks"][int(week)]["duration"] += end - start
-            else:
-                todo_times["weeks"][int(week)] = {
+            duration = end - start  # timedelta
+
+            # ---- weekly ----
+            if week_key not in todo_times["weeks"]:
+                todo_times["weeks"][week_key] = {
                     "title": t.title,
-                    "duration": (end - start),
+                    "duration": duration,
                 }
+            else:
+                todo_times["weeks"][week_key]["duration"] += duration
 
-        print("*" * 90)
-        for key, value in todo_times["weeks"].items():
-            print(key, value["duration"])
-
-        print(todo_times)
+            # ---- monthly ----
+            if month_key not in todo_times["months"]:
+                todo_times["months"][month_key] = {
+                    "title": t.title,
+                    "duration": duration,
+                }
+            else:
+                todo_times["months"][month_key]["duration"] += duration
 
         return render(
             request,
             "todo/daily_summary_time.html",
-            {"todo_times": todo_times , "todo":todo},
+            {"todo_times": todo_times, "todo": todo},
         )
