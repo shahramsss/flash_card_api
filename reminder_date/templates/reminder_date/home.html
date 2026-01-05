@@ -1,35 +1,47 @@
 {% extends 'base.html' %}
 {% load jalali_filters %}
 {% block content %}
-  <p dir="rtl" class="h4">یادآور</p>
+  <div class="container mt-4" dir="rtl">
+    <h4 class="mb-3">یادآور</h4>
 
-  <table class="table table-bordered table-striped table-hover text-center">
-    <thead>
-      <tr>
-        <th style="width:30%;">عنوان</th>
-        <th>روز اول</th>
-        <th>روز دوم</th>
-        <th>روز هفتم</th>
-        <th>ماه</th>
-        <th>سال</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for r in reminders %}
-        <tr>
-          <td style="max-width:150px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ r.title }}</td>
+    <div class="table-responsive">
+      <table class="table table-bordered table-striped table-hover text-center align-middle">
+        <thead class="table-primary">
+          <tr>
+            <th style="width:30%;">عنوان</th>
+            <th>روز اول</th>
+            <th>روز دوم</th>
+            <th>روز هفتم</th>
+            <th>ماه</th>
+            <th>سال</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in reminders %}
+            <tr>
+              <td style="max-width:200px;">
+                {% if r.id %}
+                  <a href="{% url 'reminder:remind_detail' r.id %}" class="text-decoration-none text-dark" title="{{ r.title }}">
+                    <div class="text-truncate" style="max-width: 200px;">{{ r.title }}</div>
+                  </a>
+                {% else %}
+                  <div class="text-truncate" style="max-width: 200px;" title="{{ r.title }}">{{ r.title }}</div>
+                {% endif %}
+              </td>
 
-          <td class="{% if r.one %}table-success{% endif %}">{{ r.one_date|to_jalali }}</td>
-          <td class="{% if r.two %}table-success{% endif %}">{{ r.two_date|to_jalali }}</td>
-          <td class="{% if r.seven %}table-success{% endif %}">{{ r.seven_date|to_jalali }}</td>
-          <td class="{% if r.month %}table-success{% endif %}">{{ r.month_date|to_jalali }}</td>
-          <td class="{% if r.year %}table-success{% endif %}">{{ r.year_date|to_jalali }}</td>
-        </tr>
-      {% empty %}
-        <tr>
-          <td colspan="7" class="text-center text-muted">هیچ یادآوری ثبت نشده است</td>
-        </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+              <td class="{% if r.one %}table-success{% endif %}">{{ r.one_date|to_jalali }}</td>
+              <td class="{% if r.two %}table-success{% endif %}">{{ r.two_date|to_jalali }}</td>
+              <td class="{% if r.seven %}table-success{% endif %}">{{ r.seven_date|to_jalali }}</td>
+              <td class="{% if r.month %}table-success{% endif %}">{{ r.month_date|to_jalali }}</td>
+              <td class="{% if r.year %}table-success{% endif %}">{{ r.year_date|to_jalali }}</td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="6" class="text-center text-muted">هیچ یادآوری ثبت نشده است</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
 {% endblock %}

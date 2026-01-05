@@ -22,5 +22,5 @@ from .views import *
 app_name = "reminder"
 urlpatterns = [
     path('', ReminderHomeView.as_view(), name='home'),
-    path('<int:pk>/', ReminderDetailsView.as_view(), name='home'),
+    path('<int:pk>/', ReminderDetailsView.as_view(), name='remind_detail'),
 ]

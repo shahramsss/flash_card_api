@@ -11,7 +11,7 @@ class ReminderHomeView(View):
         context = []
         for r in reminders:
             context.append(
-                {
+                {   "id":r.id,
                     "title": r.title,
                     "start_day": r.start_day,
                     "one_date": r.start_day + timedelta(days=1),
@@ -53,3 +53,10 @@ class ReminderDetailsView(View):
             "reminder_date/reminderdetails.html",
             {"reminder": reminder, "form": form},
         )
+
+
+class ReminderCreateView(View):
+    form_class = ReminderForm
+    def get(self, request):
+        form = self.form_class()
+        pass
