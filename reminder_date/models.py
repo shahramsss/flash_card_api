@@ -1,9 +1,10 @@
 from django.db import models
+from django.utils import timezone
 
 
 class Reminder(models.Model):
     title = models.CharField(max_length=512)
-    start_day = models.DateField(auto_now_add=True)
+    start_day = models.DateField(default=timezone.localdate)
     one = models.BooleanField(default=False)
     two = models.BooleanField(default=False)
     seven = models.BooleanField(default=False)

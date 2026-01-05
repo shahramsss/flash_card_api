@@ -3,15 +3,19 @@ from .models import Reminder
 from django.views import View
 from datetime import timedelta
 from .froms import ReminderForm
+from django.contrib import messages
+import datetime
 
 
 class ReminderHomeView(View):
     def get(self, request):
         reminders = Reminder.objects.all().order_by("-start_day")
+        today = datetime.datetime.now()
         context = []
         for r in reminders:
             context.append(
-                {   "id":r.id,
+                {
+                    "id": r.id,
                     "title": r.title,
                     "start_day": r.start_day,
                     "one_date": r.start_day + timedelta(days=1),
@@ -27,7 +31,14 @@ class ReminderHomeView(View):
                 }
             )
 
-        return render(request, "reminder_date/home.html", {"reminders": context})
+        return render(
+            request,
+            "reminder_date/home.html",
+            {
+                "reminders": context,
+                "today": today,
+            },
+        )
 
 
 class ReminderDetailsView(View):
@@ -57,6 +68,14 @@ class ReminderDetailsView(View):
 
 class ReminderCreateView(View):
     form_class = ReminderForm
+
     def get(self, request):
         form = self.form_class()
-        return render(request ,"reminder_date/reminder_create.html",{"form":form})
+        return render(request, "reminder_date/reminder_create.html", {"form": form})
+
+    def post(self, request):
+        form = self.form_class(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect("reminder:home")
+        return render(request, "reminder_date/reminder_create.html", {"form": form})

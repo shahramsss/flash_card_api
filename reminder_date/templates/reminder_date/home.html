@@ -1,53 +1,132 @@
 {% extends 'base.html' %}
-{% load jalali_filters %}
 {% block content %}
-  <div class="container mt-4">
+<div class="container mt-4">
   <div dir="rtl" class="row align-items-center mb-4">
-  <div class="col-md-6 text-end">
-    <h4 class="mb-0">یادآور</h4>
+    <div class="col-md-6 text-end">
+      <h4 class="mb-0">📌یادآور</h4>
+    </div>
+    <div class="col-md-6 text-start">
+      <a class="btn btn-success" href="{% url 'reminder:reminder_create' %}">ثبت یادآوری</a>
+    </div>
   </div>
-  <div class="col-md-6 text-start">
-    <a class="btn btn-success" href="{% url 'reminder:reminder_create' %}">ثبت یادآوری</a>
+
+  <!-- تاریخ امروز شمسی -->
+  <div dir="rtl" class="card shadow-sm mb-4">
+    <div class="card-body text-end">
+      <h6 class="card-title text-secondary mb-3">📅 تاریخ امروز</h6>
+      <div class="row g-2">
+        <div class="col-md-3">
+          <span class="fw-bold">تاریخ کامل:</span>
+          <span id="todayFull">-</span>
+        </div>
+        <div class="col-md-3">
+          <span class="fw-bold">روز:</span>
+          <span id="todayDay">-</span>
+        </div>
+        <div class="col-md-3">
+          <span class="fw-bold">ماه:</span>
+          <span id="todayMonth">-</span>
+        </div>
+        <div class="col-md-3">
+          <span class="fw-bold">روز هفته:</span>
+          <span id="todayWeekday">-</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-bordered table-striped table-hover text-center align-middle">
+      <thead class="table-primary">
+        <tr>
+          <th style="width:30%;">عنوان</th>
+          <th>روز اول</th>
+          <th>روز دوم</th>
+          <th>روز هفتم</th>
+          <th>ماه</th>
+          <th>سال</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in reminders %}
+        <tr>
+          <td style="max-width:200px;">
+            {% if r.id %}
+              <a href="{% url 'reminder:remind_detail' r.id %}" class="text-decoration-none text-dark" title="{{ r.title }}">
+                <div class="text-truncate" style="max-width: 200px;">{{ r.title }}</div>
+              </a>
+            {% else %}
+              <div class="text-truncate" style="max-width: 200px;" title="{{ r.title }}">{{ r.title }}</div>
+            {% endif %}
+          </td>
+
+          <!-- فقط شمسی -->
+          <td class="jalali-date {% if r.one %}table-success{% endif %}">{{ r.one_date|date:'Y-m-d' }}</td>
+          <td class="jalali-date {% if r.two %}table-success{% endif %}">{{ r.two_date|date:'Y-m-d' }}</td>
+          <td class="jalali-date {% if r.seven %}table-success{% endif %}">{{ r.seven_date|date:'Y-m-d' }}</td>
+          <td class="jalali-date {% if r.month %}table-success{% endif %}">{{ r.month_date|date:'Y-m-d' }}</td>
+          <td class="jalali-date {% if r.year %}table-success{% endif %}">{{ r.year_date|date:'Y-m-d' }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="6" class="text-center text-muted">هیچ یادآوری ثبت نشده است</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
   </div>
 </div>
 
+<script>
+// ---------- تبدیل میلادی به شمسی ----------
+function gregorianToJalali(gy, gm, gd) {
+    const g_d_m = [0,31,59,90,120,151,181,212,243,273,304,334];
+    let jy;
+    if (gy > 1600) { jy = 979; gy -= 1600; }
+    else { jy = 0; gy -= 621; }
+    let gy2 = (gm > 2) ? (gy + 1) : gy;
+    let days = 365*gy + Math.floor((gy2+3)/4) - Math.floor((gy2+99)/100) + Math.floor((gy2+399)/400) - 80 + gd + g_d_m[gm-1];
+    jy += 33*Math.floor(days/12053);
+    days %= 12053;
+    jy += 4*Math.floor(days/1461);
+    days %= 1461;
+    if(days > 365) { jy += Math.floor((days-1)/365); days=(days-1)%365; }
+    let jm = (days<186)?1+Math.floor(days/31):7+Math.floor((days-186)/30);
+    let jd = 1+((days<186)?(days%31):((days-186)%30));
+    return { jy,jm,jd };
+}
 
-    <div class="table-responsive">
-      <table class="table table-bordered table-striped table-hover text-center align-middle">
-        <thead class="table-primary">
-          <tr>
-            <th style="width:30%;">عنوان</th>
-            <th>روز اول</th>
-            <th>روز دوم</th>
-            <th>روز هفتم</th>
-            <th>ماه</th>
-            <th>سال</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for r in reminders %}
-            <tr>
-              <td style="max-width:200px;">
-                {% if r.id %}
-                  <a href="{% url 'reminder:remind_detail' r.id %}" class="text-decoration-none text-dark" title="{{ r.title }}"><div class="text-truncate" style="max-width: 200px;">{{ r.title }}</div></a>
-                {% else %}
-                  <div class="text-truncate" style="max-width: 200px;" title="{{ r.title }}">{{ r.title }}</div>
-                {% endif %}
-              </td>
+// ---------- پر کردن جدول تاریخ شمسی ----------
+document.addEventListener("DOMContentLoaded", function(){
+    // پردازش سلول‌های تاریخ
+    const cells = document.querySelectorAll('.jalali-date');
+    cells.forEach(cell => {
+        const dateParts = cell.textContent.trim().split('-');
+        if(dateParts.length===3){
+            const gy = parseInt(dateParts[0],10);
+            const gm = parseInt(dateParts[1],10);
+            const gd = parseInt(dateParts[2],10);
+            const sh = gregorianToJalali(gy, gm, gd);
+            const jm = sh.jm.toString().padStart(2,'0');
+            const jd = sh.jd.toString().padStart(2,'0');
+            cell.textContent = `${sh.jy}/${jm}/${jd}`;
+        }
+    });
 
-              <td class="{% if r.one %}table-success{% endif %}">{{ r.one_date|to_jalali }}</td>
-              <td class="{% if r.two %}table-success{% endif %}">{{ r.two_date|to_jalali }}</td>
-              <td class="{% if r.seven %}table-success{% endif %}">{{ r.seven_date|to_jalali }}</td>
-              <td class="{% if r.month %}table-success{% endif %}">{{ r.month_date|to_jalali }}</td>
-              <td class="{% if r.year %}table-success{% endif %}">{{ r.year_date|to_jalali }}</td>
-            </tr>
-          {% empty %}
-            <tr>
-              <td colspan="6" class="text-center text-muted">هیچ یادآوری ثبت نشده است</td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-  </div>
+    // ---------- تاریخ امروز ----------
+    const today = new Date();
+    const shToday = gregorianToJalali(today.getFullYear(), today.getMonth()+1, today.getDate());
+    const jm = shToday.jm.toString().padStart(2,'0');
+    const jd = shToday.jd.toString().padStart(2,'0');
+
+    document.getElementById('todayFull').textContent = `${shToday.jy}/${jm}/${jd}`;
+    document.getElementById('todayDay').textContent = jd;
+    document.getElementById('todayMonth').textContent = jm;
+
+    // روز هفته شمسی (فارسی)
+    const weekdays = ['یکشنبه','دوشنبه','سه‌شنبه','چهارشنبه','پنج‌شنبه','جمعه','شنبه'];
+    const weekdayIndex = today.getDay(); // 0 = یکشنبه
+    document.getElementById('todayWeekday').textContent = weekdays[weekdayIndex];
+});
+</script>
 {% endblock %}
