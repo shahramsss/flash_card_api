@@ -59,4 +59,4 @@ class ReminderCreateView(View):
     form_class = ReminderForm
     def get(self, request):
         form = self.form_class()
-        pass
+        return render(request ,"reminder_date/reminder_create.html",{"form":form})

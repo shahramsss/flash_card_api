@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block content %}
+  <div dir="rtl">
+    <p class="h4 ">ثبت يادآوری</p>
+    <form action="" method="post">
+      {% csrf_token %}
+      {{ form.title.label_tag }}
+      {{ form.title }}
+      <button class="btn btn-primary my-3" type="submit">ثبت</button>
+    </form>
+  </div>
+{% endblock %}
