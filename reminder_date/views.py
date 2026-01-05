@@ -79,3 +79,10 @@ class ReminderCreateView(View):
             form.save()
             return redirect("reminder:home")
         return render(request, "reminder_date/reminder_create.html", {"form": form})
+
+
+class ReminderDeleteView(View):
+    def get(self, request, pk):
+        reminder = get_object_or_404(Reminder, pk=pk)
+        reminder.delete()
+        return redirect("reminder:home")
