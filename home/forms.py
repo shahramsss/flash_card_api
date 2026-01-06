@@ -1,5 +1,5 @@
 from django import forms
-from .models import FlashCard
+from .models import FlashCard, FlashLeitner
 
 
 class CardCreateForm(forms.ModelForm):
@@ -44,5 +44,29 @@ class CardCreateForm(forms.ModelForm):
                     "class": "form-control",
                     "type": "date",
                 }
+            ),
+        }
+
+
+class FlashLeitnerForm(forms.ModelForm):
+    class Meta:
+        model = FlashLeitner
+        fields = [
+            "word",
+            "meaning",
+            "example",
+        ]
+
+        widgets = {
+            "word": forms.TextInput(attrs={"class": "form-control"}),
+            "meaning": forms.TextInput(attrs={"class": "form-control"}),
+            "example": forms.Textarea(attrs={"class": "form-control", "rows": 3}),
+            "rate": forms.NumberInput(attrs={"class": "form-control"}),
+            "last_reply": forms.CheckboxInput(attrs={"class": "form-check-input"}),
+            "next_review_date": forms.DateInput(
+                attrs={"class": "form-control", "type": "date"}
+            ),
+            "start_day": forms.DateInput(
+                attrs={"class": "form-control", "type": "date"}
             ),
         }

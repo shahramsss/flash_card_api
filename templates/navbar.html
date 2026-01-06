@@ -27,6 +27,9 @@
         {% elif request.resolver_match.app_name == "todo" %}
         {% endif %}
         <li class="nav-item">
+          <a class="nav-link active text-warning" aria-current="page" href="{% url 'home:leitner_cards' %}">leitner</a>
+        </li>
+        <li class="nav-item">
           <a class="nav-link active text-warning" aria-current="page" href="{% url 'reminder:home' %}">reminder</a>
         </li>
         <li class="nav-item">

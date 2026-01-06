@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="container mt-4">
+
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="m-0">Leitner Cards</h1>
+    <a class="btn btn-primary" href="{% url 'home:leitner_card_create' %}">Create New</a>
+  </div>
+
+  {% if cards %}
+    <div class="card shadow-sm">
+      <div class="card-body p-0">
+        <table class="table table-hover table-striped m-0">
+          <thead class="table-dark">
+            <tr>
+              <th>#</th>
+              <th>Word</th>
+              <th>Meaning</th>
+              <th>Example</th>
+              <th class="text-center">Edit</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for card in cards %}
+              <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ card.word }}</td>
+                <td>{{ card.meaning }}</td>
+                <td>{{ card.example|default:"-" }}</td>
+                <td class="text-center">
+                  <a class="btn btn-warning btn-sm" href="{% url 'home:leitner_card_edit' card.id %}">
+                    Edit
+                  </a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  {% else %}
+    <div class="alert alert-warning mt-4" role="alert">
+      No cards available.
+    </div>
+  {% endif %}
+
+</div>
+
+{% endblock %}

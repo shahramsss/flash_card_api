@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 
 class FlashCard(models.Model):
@@ -12,3 +13,18 @@ class FlashCard(models.Model):
 
     def __str__(self):
         return f"{self.word} - {self.meaning}"
+
+
+class FlashLeitner(models.Model):
+
+    word = models.CharField(max_length=512)
+    meaning = models.CharField(max_length=512)
+    example = models.CharField(max_length=1024, null=True, blank=True)
+    rate = models.SmallIntegerField(default=0)
+    last_reply = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    next_review_date = models.DateField()
+    start_day = models.DateField(default=timezone.localdate)
+
+    def __str__(self):
+        return f"{self.word} + {self.start_day}"

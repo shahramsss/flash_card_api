@@ -31,5 +31,9 @@ urlpatterns = [
     path("cardedit/<int:id>/" ,CardEditView.as_view(),name="cardedit"),
     path("cardsearch/" ,CardsSearchView.as_view(),name="cardsearch"),
     path("cardnewest/" ,CardsNewestView.as_view(),name="cardnewest"),
+    # leitner
+    path("leitnercards/" ,FlashLeitnerCardsView.as_view(),name="leitner_cards"),
+    path("leitnercardcreate/" ,FlashLeitnerCardCreateView.as_view(),name="leitner_card_create"),
+    path("leitnercardedit/<int:pk>/" ,FlashLeitnerCardEditView.as_view(),name="leitner_card_edit"),
 
 ]

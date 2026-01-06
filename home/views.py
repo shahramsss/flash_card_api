@@ -1,6 +1,6 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404, get_list_or_404
 from rest_framework.views import APIView
-from .models import FlashCard
+from .models import FlashCard, FlashLeitner
 from .serializers import FlashCardSerializer
 from rest_framework.response import Response
 from rest_framework import status
@@ -9,7 +9,7 @@ from rest_framework.exceptions import ValidationError
 from datetime import timedelta, date
 from django.views import View
 from django.db.models import Q
-from .forms import CardCreateForm
+from .forms import CardCreateForm, FlashLeitnerForm
 from django.contrib import messages
 
 
@@ -136,7 +136,9 @@ class CardDetialsView(View):
 
 class HomeView(View):
     def get(self, request):
-        cards = FlashCard.objects.filter(next_review_date__lte=date.today()).order_by("?")
+        cards = FlashCard.objects.filter(next_review_date__lte=date.today()).order_by(
+            "?"
+        )
         return render(request, "home/home.html", {"cards": cards})
 
 
@@ -208,3 +210,53 @@ class CardsNewestView(View):
         cards = FlashCard.objects.all().order_by("-created_at")
 
         return render(request, "home/cards.html", {"cards": cards})
+
+
+class FlashLeitnerCardsView(View):
+    def get(self, request):
+        cards = FlashLeitner.objects.all()
+        return render(request, "home/leitner_cards.html", {"cards": cards})
+
+
+class FlashLeitnerCardCreateView(View):
+    form_class = FlashLeitnerForm
+
+    def get(self, request):
+        form = self.form_class()
+        return render(request, "home/Leinter_card_create.html", {"form": form})
+
+    def post(self, request):
+        form = self.form_class(request.POST)
+        if form.is_valid():
+            card = form.save(commit=False)
+            card.next_review_date = date.today() + timedelta(days=1)
+            card.save()
+            word = request.POST.get("word")
+            messages.success(request, f'Word "{word}" successfully saved.', "success")
+            return redirect("home:leitner_cards")
+
+
+class FlashLeitnerCardEditView(View):
+    form_class = FlashLeitnerForm
+
+    def get(self, request, pk):
+        card = get_object_or_404(FlashLeitner, id=pk)
+        form = self.form_class(instance=card)
+        return render(request, "home/Leinter_card_edit.html", {"form": form})
+
+    def post(self, request, pk):
+        card = get_object_or_404(FlashLeitner, id=pk)
+        form = self.form_class(request.POST, instance=card)
+        if form.is_valid():
+            form.save()
+            word = request.POST.get("word")
+            messages.success(request, f'Word "{word}" successfully edited.', "warning")
+            return redirect("home:leitner_cards")
+
+
+class FlashLeitnerCardDeleteView(View):
+    pass
+
+
+class FlashLeitnerCardSetRateView(View):
+    pass
