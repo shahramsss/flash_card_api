@@ -136,7 +136,7 @@ class CardDetialsView(View):
 
 class HomeView(View):
     def get(self, request):
-        cards = FlashCard.objects.filter(next_review_date__lte=date.today())
+        cards = FlashCard.objects.filter(next_review_date__lte=date.today()).order_by("?")
         return render(request, "home/home.html", {"cards": cards})
 
 
