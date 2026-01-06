@@ -23,7 +23,7 @@
           </thead>
           <tbody>
             {% for card in cards %}
-              <tr>
+              <tr onclick="window.location='{% url 'home:leitner_card_answer' card.id %}'" style="cursor:pointer;">
                 <td>{{ forloop.counter }}</td>
                 <td>{{ card.word }}</td>
                 <td>{{ card.meaning }}</td>

@@ -269,5 +269,11 @@ class FlashLeitnerCardDeleteConfirmView(View):
         return redirect("home:leitner_cards")
 
 
-class FlashLeitnerCardSetRateView(View):
-    pass
+class FlashLeitnerCardAnswerView(View):
+    def get(self, request, pk):
+        card = get_object_or_404(FlashLeitner, pk=pk)
+        return render(request, "home/leitner_card_answer.html", {"card": card})
+
+    def post(self, request, pk):
+
+        return redirect("home:leitner_cards")

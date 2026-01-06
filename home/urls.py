@@ -36,5 +36,6 @@ urlpatterns = [
     path("leitnercardcreate/" ,FlashLeitnerCardCreateView.as_view(),name="leitner_card_create"),
     path("leitnercardedit/<int:pk>/" ,FlashLeitnerCardEditView.as_view(),name="leitner_card_edit"),
     path("leitnercarddelete/<int:pk>/" ,FlashLeitnerCardDeleteConfirmView.as_view(),name="leitner_card_delete"),
+    path("leitnercardanswer/<int:pk>/" ,FlashLeitnerCardAnswerView.as_view(),name="leitner_card_answer"),
 
 ]
