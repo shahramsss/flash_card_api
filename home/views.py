@@ -242,7 +242,9 @@ class FlashLeitnerCardEditView(View):
     def get(self, request, pk):
         card = get_object_or_404(FlashLeitner, id=pk)
         form = self.form_class(instance=card)
-        return render(request, "home/Leinter_card_edit.html", {"form": form})
+        return render(
+            request, "home/Leinter_card_edit.html", {"form": form, "card": card}
+        )
 
     def post(self, request, pk):
         card = get_object_or_404(FlashLeitner, id=pk)
@@ -254,8 +256,17 @@ class FlashLeitnerCardEditView(View):
             return redirect("home:leitner_cards")
 
 
-class FlashLeitnerCardDeleteView(View):
-    pass
+class FlashLeitnerCardDeleteConfirmView(View):
+    def get(self, request, pk):
+        card = get_object_or_404(FlashLeitner, pk=pk)
+        return render(request, "home/leitner_delete_confirm.html", {"card": card})
+
+    def post(self, request, pk):
+        card = get_object_or_404(FlashLeitner, pk=pk)
+        word = card.word
+        card.delete()
+        messages.success(request, f'Word "{word}" successfully deleted.', "danger")
+        return redirect("home:leitner_cards")
 
 
 class FlashLeitnerCardSetRateView(View):
