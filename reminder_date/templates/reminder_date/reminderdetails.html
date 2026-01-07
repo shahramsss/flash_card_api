@@ -46,7 +46,10 @@
     <button type="submit" class="btn btn-info">ذخیره تغییرات</button>
   </form>
   <hr>
-    <a  class="btn btn-danger" href="{% url 'reminder:reminder_delete' reminder.id %}">حذف</a>
+    <div class="d-flex justify-content-end">
+      <a  class="btn btn-danger" href="{% url 'reminder:reminder_delete' reminder.id %}">حذف</a>
+    </div>
+
   <script>
     function toggleCheckbox(id, btn) {
       const checkbox = document.getElementById(id);

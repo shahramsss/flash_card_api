@@ -8,5 +8,10 @@
   </form>
 
   <hr />
-  <a class="btn btn-danger" href="{% url 'home:leitner_card_delete' card.id %}">delete</a>
+
+  <div class="d-flex justify-content-end">
+    <a class="btn btn-danger" href="{% url 'home:leitner_card_delete' card.id %}">delete</a>
+  </div>
+  
+
 {% endblock %}
