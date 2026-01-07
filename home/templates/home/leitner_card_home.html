@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <body class="bg-light">
+    <div class="container d-flex justify-content-center align-items-center" style="height: 75vh;">
+      <div class="d-flex flex-column gap-4 w-100" style="max-width: 400px;">
+        <a href="{% url 'home:leitner_review' %}" class="btn btn-success big-btn text-center">Review</a>
+        <a href="{% url 'home:leitner_cards' %}" class="btn btn-secondary big-btn text-center">All</a>
+        <a href="{% url 'home:leitner_wrong_cards' %}" class="btn btn-danger big-btn text-center">Wrongs</a>
+        <a href="{% url 'home:leitner_card_create' %}" class="btn btn-primary big-btn text-center">New</a>
+
+
+
+      </div>
+    </div>
+  </body>
+{% endblock %}

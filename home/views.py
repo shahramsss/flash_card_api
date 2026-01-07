@@ -223,7 +223,7 @@ class FlashLeitnerCardCreateView(View):
 
     def get(self, request):
         form = self.form_class()
-        return render(request, "home/Leinter_card_create.html", {"form": form})
+        return render(request, "home/leinter_card_create.html", {"form": form})
 
     def post(self, request):
         form = self.form_class(request.POST)
@@ -243,7 +243,7 @@ class FlashLeitnerCardEditView(View):
         card = get_object_or_404(FlashLeitner, id=pk)
         form = self.form_class(instance=card)
         return render(
-            request, "home/Leinter_card_edit.html", {"form": form, "card": card}
+            request, "home/leinter_card_edit.html", {"form": form, "card": card}
         )
 
     def post(self, request, pk):
@@ -320,9 +320,25 @@ class FlashLeitnerCardAnswerView(View):
 
 class FlashLeitnerCardWrongAnswerView(View):
     def get(self, request):
-        cards = FlashLeitner.objects.filter(last_reply = False)
+        cards = FlashLeitner.objects.filter(last_reply=False)
         return render(request, "home/leitner_wrong_cards.html", {"cards": cards})
 
 
 class FlashLeitnerCardHomeView(View):
-    def get(self , request)
+    def get(self, request):
+        return render(
+            request,
+            "home/leitner_card_home.html",
+        )
+
+
+class FlashLeitnerRewviewView(View):
+    def get(self, request):
+        today = date.today()
+        next_card = FlashLeitner.objects.filter(next_review_date__lte=today).order_by(
+            "?"
+        )
+        if next_card.exists():
+            return redirect("home:leitner_card_answer", next_card.first().id)
+        messages.success(request, "no cards exists for review!", "warning")
+        return redirect("home:leitner_home")
