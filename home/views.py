@@ -233,7 +233,7 @@ class FlashLeitnerCardCreateView(View):
             card.save()
             word = request.POST.get("word")
             messages.success(request, f'Word "{word}" successfully saved.', "success")
-            return redirect("home:leitner_cards")
+            return redirect("home:leitner_card_create")
 
 
 class FlashLeitnerCardEditView(View):
