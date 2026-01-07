@@ -214,7 +214,7 @@ class CardsNewestView(View):
 
 class FlashLeitnerCardsView(View):
     def get(self, request):
-        cards = FlashLeitner.objects.all()
+        cards = FlashLeitner.objects.all().order_by("-created_at")
         return render(request, "home/leitner_cards.html", {"cards": cards})
 
 
