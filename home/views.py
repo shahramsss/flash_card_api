@@ -320,5 +320,9 @@ class FlashLeitnerCardAnswerView(View):
 
 class FlashLeitnerCardWrongAnswerView(View):
     def get(self, request):
-        cards = FlashLeitner.objects.filter(last_reply == True)
+        cards = FlashLeitner.objects.filter(last_reply = False)
         return render(request, "home/leitner_wrong_cards.html", {"cards": cards})
+
+
+class FlashLeitnerCardHomeView(View):
+    def get(self , request)

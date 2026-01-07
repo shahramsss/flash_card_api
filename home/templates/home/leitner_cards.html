@@ -5,7 +5,11 @@
 
   <div class="d-flex justify-content-between align-items-center mb-4">
     <h1 class="m-0">Leitner Cards</h1>
-    <a class="btn btn-primary" href="{% url 'home:leitner_card_create' %}">Create New</a>
+    <div>
+      <a class="btn btn-success" href="{% url 'home:leitner_cards' %}">Leitner Cards</a>
+      <a class="btn btn-danger" href="{% url 'home:leitner_wrong_cards' %}">Leitner Wrong Cards</a>
+      <a class="btn btn-primary" href="{% url 'home:leitner_card_create' %}">Create New</a>
+    </div>
   </div>
 
   {% if cards %}
