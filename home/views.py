@@ -275,5 +275,50 @@ class FlashLeitnerCardAnswerView(View):
         return render(request, "home/leitner_card_answer.html", {"card": card})
 
     def post(self, request, pk):
+        today = date.today()
+        answer = request.POST.get("answer")
+        card = get_object_or_404(FlashLeitner, pk=pk)
+        card_rate = card.rate
+
+        if answer == "true":
+            card.rate += 1
+            card.last_reply = True
+
+            match card_rate:
+                case 0:
+                    days = 1
+                case 1:
+                    days = 3
+                case 2:
+                    days = 10
+                case 3:
+                    days = 40
+                case 4:
+                    days = 405
+
+            card.next_review_date = today + timedelta(days=days)
+
+        else:
+            # if false answer card to 0 level
+            card.rate = 0
+            card.last_reply = False
+            card.next_review_date = today + timedelta(days=1)
+
+        card.save()
+
+        next_card = (
+            FlashLeitner.objects.filter(next_review_date__lte=today)
+            .exclude(pk=card.pk)
+            .order_by("?")
+        )
+
+        if next_card.exists():
+            return redirect("home:leitner_card_answer", next_card.first().id)
 
         return redirect("home:leitner_cards")
+
+
+class FlashLeitnerCardWrongAnswerView(View):
+    def get(self, request):
+        cards = FlashLeitner.objects.filter(last_reply == True)
+        return render(request, "home/leitner_wrong_cards.html", {"cards": cards})
