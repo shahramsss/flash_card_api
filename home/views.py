@@ -11,7 +11,7 @@ from django.views import View
 from django.db.models import Q
 from .forms import CardCreateForm, FlashLeitnerForm
 from django.contrib import messages
-
+from django.core.paginator import Paginator
 
 class Home(APIView):
     def get(self, request):
@@ -225,7 +225,10 @@ class FlashLeitnerCardsView(View):
             )
         else:
             cards = FlashLeitner.objects.all().order_by("-created_at")
-        return render(request, "home/leitner_cards.html", {"cards": cards})
+        paginator = Paginator(cards, 10)  # 10 items per page
+        page_number = request.GET.get("page")
+        page_obj = paginator.get_page(page_number)
+        return render(request, "home/leitner_cards.html", {"cards": page_obj})
 
 
 class FlashLeitnerCardCreateView(View):

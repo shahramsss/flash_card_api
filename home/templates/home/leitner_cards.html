@@ -34,7 +34,7 @@
                   <td>{{ forloop.counter }}</td>
                   <td>{{ card.word }}</td>
                   <td>{{ card.meaning }}</td>
-                  <td>{{ card.example|default:'-' }}</td>
+                  <td>{{ card.example|default:"-" }}</td>
                   <td class="text-center">
                     <a class="btn btn-warning btn-sm" href="{% url 'home:leitner_card_edit' card.id %}">Edit</a>
                   </td>
@@ -47,5 +47,35 @@
     {% else %}
       <div class="alert alert-warning mt-4" role="alert">No cards available.</div>
     {% endif %}
-  </div>
+<nav class="mt-3">
+    <ul class="pagination justify-content-center mb-0">
+      {% if cards.has_previous %}
+      <li class="page-item">
+        <a
+          class="page-link"
+          href="?page={{ cards.previous_page_number }}&query={{ request.GET.query }}"
+        >
+          Previous
+        </a>
+      </li>
+      {% endif %}
+
+      <li class="page-item active">
+        <span class="page-link">
+          Page {{ cards.number }} of {{ cards.paginator.num_pages }}
+        </span>
+      </li>
+
+      {% if cards.has_next %}
+      <li class="page-item">
+        <a
+          class="page-link"
+          href="?page={{ cards.next_page_number }}&query={{ request.GET.query }}"
+        >
+          Next
+        </a>
+      </li>
+      {% endif %}
+    </ul>
+  </nav>
 {% endblock %}
