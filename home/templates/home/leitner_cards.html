@@ -10,6 +10,11 @@
       </div>
     </div>
 
+    <form class="d-flex ms-auto my-2" action="{% url 'home:leitner_cards' %}" method="get">
+      <input class="form-control me-2" type="search" placeholder="Search Cards" aria-label="Search" name="query" value="{{ request.GET.query }}" />
+      <button class="btn btn-success" type="submit">Search</button>
+    </form>
+
     {% if cards %}
       <div class="card shadow-sm">
         <div class="card-body p-0">
@@ -25,7 +30,7 @@
             </thead>
             <tbody>
               {% for card in cards %}
-                <tr onclick="window.location='{% url 'home:leitner_card_answer' card.id %}'" style="cursor:pointer;">
+                <tr>
                   <td>{{ forloop.counter }}</td>
                   <td>{{ card.word }}</td>
                   <td>{{ card.meaning }}</td>

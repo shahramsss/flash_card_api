@@ -214,7 +214,17 @@ class CardsNewestView(View):
 
 class FlashLeitnerCardsView(View):
     def get(self, request):
-        cards = FlashLeitner.objects.all().order_by("-created_at")
+        query = request.GET.get(
+            "query", ""
+        )  # در صورتی که query وجود نداشته باشد، مقدار پیش‌فرض "" خواهد بود
+        if query:
+            cards = FlashLeitner.objects.filter(
+                Q(word__icontains=query)
+                | Q(meaning__icontains=query)
+                | Q(example__icontains=query)
+            )
+        else:
+            cards = FlashLeitner.objects.all().order_by("-created_at")
         return render(request, "home/leitner_cards.html", {"cards": cards})
 
 
