@@ -28,6 +28,7 @@ class ReminderHomeView(View):
                     "seven": r.seven,
                     "month": r.month,
                     "year": r.year,
+                    "today": today,
                 }
             )
 

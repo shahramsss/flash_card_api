@@ -1,75 +1,207 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="container mt-4">
-  <div dir="rtl" class="row align-items-center mb-4">
-    <div class="col-md-6 text-end">
-      <h4 class="mb-0">📌یادآور</h4>
+<div dir="rtl" class="dark-theme-wrapper p-3 p-md-4">
+
+  <style>
+    /* ساختار کلی دارک‌مد */
+    .dark-theme-wrapper {
+      background-color: #121212;
+      color: #e0e0e0;
+      border-radius: 14px;
+      font-size: 1.05rem;
+    }
+
+    /* هدر و دکمه‌ها */
+    .page-title {
+      color: #ffffff;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    /* استایل کارت تاریخ امروز */
+    .today-card {
+      background: linear-gradient(145deg, #1e222b, #17191f);
+      border: 1px solid #2d333f;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+    }
+
+    .today-stat-box {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 8px;
+      padding: 10px 14px;
+      transition: all 0.2s ease;
+    }
+
+    .today-stat-box:hover {
+      background: rgba(255, 255, 255, 0.06);
+      border-color: #0d6efd;
+    }
+
+    .stat-label {
+      color: #9aa4b2;
+      font-size: 0.9rem;
+      margin-bottom: 2px;
+    }
+
+    .stat-value {
+      color: #58a6ff;
+      font-weight: 700;
+      font-size: 1.15rem;
+    }
+
+    /* استایل جدول دارک‌مد */
+    .custom-dark-table {
+      background-color: #181a1f;
+      border-collapse: separate;
+      border-spacing: 0;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid #2c313a;
+      width: 100%;
+      color: #e0e0e0;
+    }
+
+    .custom-dark-table thead th {
+      background-color: #21262d;
+      color: #8b949e;
+      font-weight: 600;
+      border-bottom: 2px solid #30363d;
+      padding: 14px 10px;
+      font-size: 0.95rem;
+    }
+
+    .custom-dark-table tbody td {
+      background-color: #16191e;
+      border-bottom: 1px solid #252a32;
+      padding: 12px 10px;
+      font-size: 0.95rem;
+      vertical-align: middle;
+    }
+
+    .custom-dark-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .custom-dark-table tbody tr:hover td {
+      background-color: #212631;
+    }
+
+    /* لینک عنوان‌ها */
+    .reminder-link {
+      color: #f0f6fc;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.15s;
+    }
+
+    .reminder-link:hover {
+      color: #58a6ff;
+      text-decoration: underline;
+    }
+
+    /* هایلایت خانه‌های فعال/تکمیل‌شده */
+    .date-active {
+      background-color: rgba(35, 134, 54, 0.22) !important;
+      color: #3fb950 !important;
+      font-weight: 600;
+      border-radius: 6px;
+    }
+
+    /* سلول تاریخ غیرفعال */
+    .date-inactive {
+      color: #8b949e;
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-size: 0.9rem;
+    }
+  </style>
+
+  <!-- هدر صفحه -->
+  <div class="row align-items-center mb-4 g-3">
+    <div class="col-sm-6 text-end">
+      <h4 class="page-title mb-0">📌 لیست یادآورها</h4>
     </div>
-    <div class="col-md-6 text-start">
-      <a class="btn btn-success" href="{% url 'reminder:reminder_create' %}">ثبت یادآوری</a>
+    <div class="col-sm-6 text-start">
+      <a class="btn btn-success px-4 py-2 shadow-sm" href="{% url 'reminder:reminder_create' %}">
+        <i class="bi bi-plus-lg"></i> + ثبت یادآوری جدید
+      </a>
     </div>
   </div>
 
-  <!-- تاریخ امروز شمسی -->
-  <div dir="rtl" class="card shadow-sm mb-4">
-    <div class="card-body text-end">
-      <h6 class="card-title text-secondary mb-3">📅 تاریخ امروز</h6>
-      <div class="row g-2">
-        <div class="col-md-3">
-          <span class="fw-bold">تاریخ کامل:</span>
-          <span id="todayFull">-</span>
+  <!-- کارت نمایش تاریخ امروز -->
+  <div class="today-card mb-4 p-3 p-md-4">
+    <div class="d-flex align-items-center mb-3">
+      <span class="text-warning me-2">📅</span>
+      <h6 class="mb-0 text-light fw-bold">اطلاعات تاریخ امروز</h6>
+    </div>
+    <div class="row g-3">
+      <div class="col-6 col-md-3">
+        <div class="today-stat-box text-center">
+          <div class="stat-label">تاریخ کامل</div>
+          <div class="stat-value" id="todayFull">-</div>
         </div>
-        <div class="col-md-3">
-          <span class="fw-bold">روز:</span>
-          <span id="todayDay">-</span>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="today-stat-box text-center">
+          <div class="stat-label">روز هفته</div>
+          <div class="stat-value text-info" id="todayWeekday">-</div>
         </div>
-        <div class="col-md-3">
-          <span class="fw-bold">ماه:</span>
-          <span id="todayMonth">-</span>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="today-stat-box text-center">
+          <div class="stat-label">روز</div>
+          <div class="stat-value text-light" id="todayDay">-</div>
         </div>
-        <div class="col-md-3">
-          <span class="fw-bold">روز هفته:</span>
-          <span id="todayWeekday">-</span>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="today-stat-box text-center">
+          <div class="stat-label">ماه</div>
+          <div class="stat-value text-light" id="todayMonth">-</div>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="table-responsive">
-    <table class="table table-bordered table-striped table-hover text-center align-middle">
-      <thead class="table-primary">
+  <!-- جدول نمایش یادآورها -->
+  <div class="table-responsive shadow-sm" style="border-radius: 10px;">
+    <table class="custom-dark-table text-center align-middle mb-0">
+      <thead>
         <tr>
-          <th style="width:30%;">عنوان</th>
+          <th style="width: 32%; text-align: right; padding-right: 18px;">عنوان یادآور</th>
           <th>روز اول</th>
           <th>روز دوم</th>
           <th>روز هفتم</th>
-          <th>ماه</th>
-          <th>سال</th>
+          <th>یک ماه</th>
+          <th>یک سال</th>
         </tr>
       </thead>
       <tbody>
         {% for r in reminders %}
         <tr>
-          <td style="max-width:200px;">
+          <!-- ستون عنوان -->
+          <td class="text-end" style="max-width: 240px; padding-right: 18px;">
             {% if r.id %}
-              <a href="{% url 'reminder:remind_detail' r.id %}" class="text-decoration-none text-dark" title="{{ r.title }}">
-                <div class="text-truncate" style="max-width: 200px;">{{ r.title }}</div>
+              <a href="{% url 'reminder:remind_detail' r.id %}" class="reminder-link text-truncate d-block" title="{{ r.title }}">
+                {{ r.title }}
               </a>
             {% else %}
-              <div class="text-truncate" style="max-width: 200px;" title="{{ r.title }}">{{ r.title }}</div>
+              <div class="text-truncate text-light" style="max-width: 240px;" title="{{ r.title }}">{{ r.title }}</div>
             {% endif %}
           </td>
 
-          <!-- فقط شمسی -->
-          <td class="jalali-date {% if r.one %}table-success{% endif %}">{{ r.one_date|date:'Y-m-d' }}</td>
-          <td class="jalali-date {% if r.two %}table-success{% endif %}">{{ r.two_date|date:'Y-m-d' }}</td>
-          <td class="jalali-date {% if r.seven %}table-success{% endif %}">{{ r.seven_date|date:'Y-m-d' }}</td>
-          <td class="jalali-date {% if r.month %}table-success{% endif %}">{{ r.month_date|date:'Y-m-d' }}</td>
-          <td class="jalali-date {% if r.year %}table-success{% endif %}">{{ r.year_date|date:'Y-m-d' }}</td>
+          <!-- ستون‌های تاریخ شمسی با هایلایت در صورت تیک خوردن -->
+          <td class="jalali-date {% if r.one %}date-active{% else %}date-inactive{% endif %}">{{ r.one_date|date:'Y-m-d' }}</td>
+          <td class="jalali-date {% if r.two %}date-active{% else %}date-inactive{% endif %}">{{ r.two_date|date:'Y-m-d' }}</td>
+          <td class="jalali-date {% if r.seven %}date-active{% else %}date-inactive{% endif %}">{{ r.seven_date|date:'Y-m-d' }}</td>
+          <td class="jalali-date {% if r.month %}date-active{% else %}date-inactive{% endif %}">{{ r.month_date|date:'Y-m-d' }}</td>
+          <td class="jalali-date {% if r.year %}date-active{% else %}date-inactive{% endif %}">{{ r.year_date|date:'Y-m-d' }}</td>
         </tr>
         {% empty %}
         <tr>
-          <td colspan="6" class="text-center text-muted">هیچ یادآوری ثبت نشده است</td>
+          <td colspan="6" class="text-center py-4 text-muted">
+            هیچ یادآوری تاکنون ثبت نشده است.
+          </td>
         </tr>
         {% endfor %}
       </tbody>
@@ -96,13 +228,13 @@ function gregorianToJalali(gy, gm, gd) {
     return { jy,jm,jd };
 }
 
-// ---------- پر کردن جدول تاریخ شمسی ----------
+// ---------- پر کردن مقادیر تاریخ شمسی ----------
 document.addEventListener("DOMContentLoaded", function(){
-    // پردازش سلول‌های تاریخ
+    // پردازش سلول‌های تاریخ جدول
     const cells = document.querySelectorAll('.jalali-date');
     cells.forEach(cell => {
         const dateParts = cell.textContent.trim().split('-');
-        if(dateParts.length===3){
+        if(dateParts.length === 3){
             const gy = parseInt(dateParts[0],10);
             const gm = parseInt(dateParts[1],10);
             const gd = parseInt(dateParts[2],10);
@@ -113,7 +245,7 @@ document.addEventListener("DOMContentLoaded", function(){
         }
     });
 
-    // ---------- تاریخ امروز ----------
+    // ---------- نمایش باکس تاریخ امروز ----------
     const today = new Date();
     const shToday = gregorianToJalali(today.getFullYear(), today.getMonth()+1, today.getDate());
     const jm = shToday.jm.toString().padStart(2,'0');
@@ -123,9 +255,9 @@ document.addEventListener("DOMContentLoaded", function(){
     document.getElementById('todayDay').textContent = jd;
     document.getElementById('todayMonth').textContent = jm;
 
-    // روز هفته شمسی (فارسی)
+    // روزهای هفته شمسی
     const weekdays = ['یکشنبه','دوشنبه','سه‌شنبه','چهارشنبه','پنج‌شنبه','جمعه','شنبه'];
-    const weekdayIndex = today.getDay(); // 0 = یکشنبه
+    const weekdayIndex = today.getDay();
     document.getElementById('todayWeekday').textContent = weekdays[weekdayIndex];
 });
 </script>

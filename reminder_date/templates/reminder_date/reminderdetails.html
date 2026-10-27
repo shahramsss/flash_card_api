@@ -1,68 +1,216 @@
 {% extends 'base.html' %}
 {% load jalali_filters %}
+{% load markdown_extras %}
+
 {% block content %}
-<div dir="rtl">
-  <p dir="rtl " class="h4 mb-4">یادآور</p>
+<div dir="rtl" class="dark-theme-wrapper p-3 my-2 p-md-4">
 
-  <p>تاریخ شروع: <span dir="ltr">{{ reminder.start_day|to_jalali }}</span></p>
+  <!-- کتابخانه Highlight.js برای رنگ‌آمیزی کدها -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 
+  <style>
+    /* استایل‌های دارک‌مد کلی صفحه */
+    .dark-theme-wrapper {
+      background-color: #121212;
+      color: #e0e0e0;
+      border-radius: 12px;
+      font-size: 1.05rem;
+    }
+
+    hr {
+      border-color: #333940;
+      opacity: 1;
+    }
+
+    /* کارت نمایش توضیحات */
+    .dark-theme-wrapper .card {
+      background-color: #1e1e1e;
+      border: 1px solid #2d3238;
+      color: #e0e0e0;
+    }
+
+    .dark-theme-wrapper .card-header {
+      background-color: #252525;
+      border-bottom: 1px solid #2d3238;
+      color: #ffffff;
+      font-size: 1.1rem;
+    }
+
+    /* متن توضیحات */
+    .note-content {
+      direction: rtl;
+      text-align: right;
+      font-size: 1.05rem;
+      line-height: 2;
+    }
+    
+    .note-content p {
+      direction: auto;
+      text-align: start;
+      margin-bottom: 1rem;
+    }
+
+    /* بلاک‌های کد چندخطی */
+    .note-content pre {
+      direction: ltr !important;
+      text-align: left !important;
+      background-color: #181a1f !important;
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin: 1.2rem 0;
+      overflow-x: auto;
+      border: 1px solid #2c313a;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .note-content code {
+      font-family: 'Consolas', 'Fira Code', 'Courier New', monospace;
+      font-size: 1rem;
+    }
+
+    /* کدهای درون‌خطی */
+    .note-content p code {
+      background-color: #2d3139;
+      color: #ff7b72;
+      padding: 3px 8px;
+      border-radius: 5px;
+      direction: ltr;
+      display: inline-block;
+      font-size: 0.95rem;
+    }
+
+    /* استایل اینپوت‌ها و فیلدهای فرم در حالت دارک */
+    .dark-theme-wrapper input[type="text"],
+    .dark-theme-wrapper input[type="date"],
+    .dark-theme-wrapper textarea,
+    .dark-theme-wrapper .form-control {
+      background-color: #1c1f24;
+      border: 1px solid #3b424d;
+      color: #ffffff;
+      font-size: 1.05rem;
+      padding: 10px 14px;
+      border-radius: 6px;
+      width: 100%;
+    }
+
+    .dark-theme-wrapper input:focus,
+    .dark-theme-wrapper textarea:focus {
+      background-color: #22262c;
+      border-color: #0d6efd;
+      color: #ffffff;
+      box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+      outline: none;
+    }
+
+    .dark-theme-wrapper label {
+      color: #b0b8c4;
+      margin-bottom: 6px;
+      font-size: 1rem;
+    }
+  </style>
+
+  <p class="h3 mb-4 text-white">یادآور</p>
+
+  <p class="text-secondary">تاریخ شروع: <span dir="ltr" class="text-info fw-bold">{{ reminder.start_day|to_jalali }}</span></p>
+
+  <div class="container mt-4 px-0">
+    <h4 class="mb-3 text-light">{{ reminder.title }}</h4>
+
+    {% if reminder.description %}
+    <div class="card mb-4 shadow-sm">
+      <div class="card-header py-3">
+        <strong>توضیحات و کدها</strong>
+      </div>
+      <div class="card-body p-4">
+        <div class="note-content">
+          {{ reminder.description|markdown|safe }}
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <p class="text-secondary">توضیحی ثبت نشده است</p>
+    {% endif %}
+  </div>
+
+  <hr class="my-4">
 
   <form method="post">
     {% csrf_token %}
+
     <div class="mb-3">
       {{ form.title.label_tag }}
       {{ form.title }}
     </div>
 
+    <!-- توضیحات -->
+    <div class="mb-3">
+      {{ form.description.label_tag }}
+      {{ form.description }}
+    </div>
+
     <!-- دکمه‌ها -->
-    <div class="d-flex flex-column  gap-2">
+    <div class="d-flex flex-wrap gap-2 my-4">
       <input type="checkbox" id="id_one" name="one" {% if reminder.one %}checked{% endif %} class="d-none">
       <button type="button"
-        class="btn text-center {% if reminder.one %}btn-success{% else %}btn-outline-success{% endif %} w-25 text-end"
+        class="btn text-center {% if reminder.one %}btn-success{% else %}btn-outline-secondary text-light{% endif %} px-4"
         onclick="toggleCheckbox('id_one', this)">۱ روز</button>
 
       <input type="checkbox" id="id_two" name="two" {% if reminder.two %}checked{% endif %} class="d-none">
       <button type="button"
-        class="btn text-center {% if reminder.two %}btn-success{% else %}btn-outline-success{% endif %} w-25 text-end"
+        class="btn text-center {% if reminder.two %}btn-success{% else %}btn-outline-secondary text-light{% endif %} px-4"
         onclick="toggleCheckbox('id_two', this)">۲ روز</button>
 
       <input type="checkbox" id="id_seven" name="seven" {% if reminder.seven %}checked{% endif %} class="d-none">
       <button type="button"
-        class="btn text-center {% if reminder.seven %}btn-success{% else %}btn-outline-success{% endif %} w-25 text-end"
+        class="btn text-center {% if reminder.seven %}btn-success{% else %}btn-outline-secondary text-light{% endif %} px-4"
         onclick="toggleCheckbox('id_seven', this)">۷ روز</button>
 
       <input type="checkbox" id="id_month" name="month" {% if reminder.month %}checked{% endif %} class="d-none">
       <button type="button"
-        class="btn text-center {% if reminder.month %}btn-success{% else %}btn-outline-success{% endif %} w-25 text-end"
+        class="btn text-center {% if reminder.month %}btn-success{% else %}btn-outline-secondary text-light{% endif %} px-4"
         onclick="toggleCheckbox('id_month', this)">ماه</button>
 
       <input type="checkbox" id="id_year" name="year" {% if reminder.year %}checked{% endif %} class="d-none">
       <button type="button"
-        class="btn text-center {% if reminder.year %}btn-success{% else %}btn-outline-success{% endif %} w-25 text-end"
+        class="btn text-center {% if reminder.year %}btn-success{% else %}btn-outline-secondary text-light{% endif %} px-4"
         onclick="toggleCheckbox('id_year', this)">سال</button>
     </div>
 
-    <br>
-    <button type="submit" class="btn btn-info">ذخیره تغییرات</button>
-  </form>
-  <hr>
-    <div class="d-flex justify-content-end">
-      <a  class="btn btn-danger" href="{% url 'reminder:reminder_delete' reminder.id %}">حذف</a>
+    <div class="d-flex gap-2">
+      <button type="submit" class="btn btn-warning px-4">ذخیره تغییرات</button>
+      <a href="{% url 'reminder:home' %}" class="btn btn-outline-secondary text-light px-4">برگشت</a>
     </div>
+  </form>
 
-  <script>
-    function toggleCheckbox(id, btn) {
-      const checkbox = document.getElementById(id);
-      checkbox.checked = !checkbox.checked;
-      if (checkbox.checked) {
-        btn.classList.remove("btn-outline-success");
-        btn.classList.add("btn-success");
-      } else {
-        btn.classList.remove("btn-success");
-        btn.classList.add("btn-outline-success");
-      }
+  <hr class="my-4">
+
+  <div class="d-flex justify-content-end mb-4">
+    <a class="btn btn-danger" href="{% url 'reminder:reminder_delete' reminder.id %}">حذف</a>
+  </div>
+
+</div>
+
+<!-- اسکریپت‌ها -->
+<script>
+  // فعال‌سازی رنگ‌آمیزی کدها
+  document.addEventListener('DOMContentLoaded', (event) => {
+    document.querySelectorAll('pre code').forEach((el) => {
+      hljs.highlightElement(el);
+    });
+  });
+
+  // تاگل چک‌باکس‌ها
+  function toggleCheckbox(id, btn) {
+    const checkbox = document.getElementById(id);
+    checkbox.checked = !checkbox.checked;
+    if (checkbox.checked) {
+      btn.classList.remove("btn-outline-secondary");
+      btn.classList.add("btn-success");
+    } else {
+      btn.classList.remove("btn-success");
+      btn.classList.add("btn-outline-secondary");
     }
-  </script>
-
-
-  {% endblock %}
+  }
+</script>
+{% endblock %}

@@ -10,6 +10,7 @@ class Reminder(models.Model):
     seven = models.BooleanField(default=False)
     month = models.BooleanField(default=False)
     year = models.BooleanField(default=False)
-
+    description = models.TextField(blank=True, null=True) 
+    
     def __str__(self):
         return f"{self.title} + {self.start_day}"

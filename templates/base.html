@@ -14,14 +14,36 @@
       {% endblock %}
     </title>
 
-    <style>
-    /* تعریف فونت‌ها */
-    @font-face {
-      font-family: "Yekan";
-      src: url(</style>
+<style>
+
+        @font-face {
+            font-family: "byekan";
+            src: url({% static "fonts/yekan.ttf"%});
+        }
+
+        @font-face {
+            font-family: "byekan2";
+            src: url({% static "fonts/byekan2.TTF"%});
+        }
+
+        @font-face {
+            font-family: "sans";
+            src: url({% static "fonts/iraniansans.ttf"%});
+        }
+
+        @font-face {
+            font-family: "Vazir";
+            src: url("{% static 'fonts/Vazir.woff2' %}") format("woff2"),
+            url("{% static 'fonts/Vazir.woff' %}") format("woff"),
+            url("{% static 'fonts/Vazir.ttf' %}") format("truetype");
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
+        }
+</style>
   </head>
 
-  <body class="bg-light byekan2">
+  <body class="bg-light" style="font-family: Vazir">
     {% include 'navbar.html' %}
     <div class="container mt-5">
       {% include 'inc/message.html' %}
